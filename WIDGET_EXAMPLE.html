@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Παράδειγμα Ενσωμάτωσης Widget Προσβασιμότητας</title>
+
+  <!-- Φόρτωση CSS του widget -->
+  <link rel="stylesheet" href="./dist-widget/a11y-widget.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+
+    header {
+      background-color: #fff;
+      padding: 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      margin-bottom: 0.5rem;
+      color: #2c3e50;
+    }
+
+    header p {
+      color: #666;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    section {
+      background-color: #fff;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    section h2 {
+      margin-bottom: 1rem;
+      color: #2c3e50;
+      font-size: 1.8rem;
+    }
+
+    section p {
+      margin-bottom: 1rem;
+      color: #555;
+      font-size: 1.1rem;
+    }
+
+    a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .feature-card {
+      padding: 1.5rem;
+      background-color: #f8f9fa;
+      border-left: 4px solid #3498db;
+      border-radius: 6px;
+      transition: transform 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-card h3 {
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .feature-card p {
+      color: #666;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    code {
+      background-color: #f4f4f4;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      color: #e83e8c;
+    }
+
+    pre {
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      padding: 1.5rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    pre code {
+      background: none;
+      color: #ecf0f1;
+      padding: 0;
+    }
+
+    footer {
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      padding: 2rem;
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    .highlight-box {
+      background-color: #fff3cd;
+      border: 1px solid #ffc107;
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+
+    .highlight-box strong {
+      color: #856404;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎯 Widget Προσβασιμότητας</h1>
+    <p>Κάντε κλικ στο κουμπί προσβασιμότητας στην κάτω δεξιά γωνία για να δείτε όλες τις δυνατότητες!</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Καλώς ήρθατε στο Demo</h2>
+      <p>
+        Αυτή η σελίδα επιδεικνύει πώς να ενσωματώσετε το widget προσβασιμότητας σε <strong>οποιαδήποτε ιστοσελίδα</strong>
+        χωρίς να χρειάζεται React ή άλλα frameworks. Το widget είναι πλήρως αυτόνομο και λειτουργεί με απλό HTML!
+      </p>
+      <div class="highlight-box">
+        <strong>💡 Συμβουλή:</strong> Κάντε κλικ στο μπλε κουμπί προσβασιμότητας στο κάτω δεξιά για να ανοίξει ο πίνακας ελέγχου.
+      </div>
+    </section>
+
+    <section>
+      <h2>📋 Διαθέσιμα Χαρακτηριστικά</h2>
+      <p>Το widget προσφέρει 11 πλήρως λειτουργικά εργαλεία προσβασιμότητας:</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>📏 Μέγεθος Κειμένου</h3>
+          <p>Αυξήστε ή μειώστε το μέγεθος του κειμένου από 80% έως 200%</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>🎨 Υψηλή Αντίθεση</h3>
+          <p>Ενεργοποιήστε τη λειτουργία μαύρου φόντου με λευκό κείμενο</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>⏸️ Παύση Κινήσεων</h3>
+          <p>Απενεργοποιήστε όλες τις κινήσεις και τις μεταβάσεις</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>🔗 Επισήμανση Συνδέσμων</h3>
+          <p>Κάντε τους συνδέσμους πιο ορατούς με κίτρινο φόντο</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>👁️ Οδηγός Ανάγνωσης</h3>
+          <p>Ένας οπτικός κανόνας που ακολουθεί το ποντίκι σας</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>📖 Γραμματοσειρά Δυσλεξίας</h3>
+          <p>Γραμματοσειρά φιλική προς άτομα με δυσλεξία</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>🖼️ Απόκρυψη Εικόνων</h3>
+          <p>Απόκρυψη εικόνων για περισσότερη εστίαση στο κείμενο</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>📐 Ύψος Γραμμής</h3>
+          <p>Προσαρμόστε το κενό μεταξύ των γραμμών (80-200%)</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>↔️ Απόσταση Γραμμάτων</h3>
+          <p>Αυξήστε την απόσταση μεταξύ των γραμμάτων</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>🖱️ Μέγεθος Δείκτη</h3>
+          <p>Μεγαλώστε τον κέρσορα του ποντικιού (100-300%)</p>
+        </div>
+
+        <div class="feature-card">
+          <h3>🔊 Ανάγνωση Σελίδας</h3>
+          <p>Ακούστε ολόκληρο το περιεχόμενο της σελίδας δυνατά</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>🚀 Οδηγός Ενσωμάτωσης</h2>
+      <p>Για να χρησιμοποιήσετε το widget στη δική σας ιστοσελίδα, απλά προσθέστε αυτά τα 2 αρχεία:</p>
+
+      <h3>Βήμα 1: Προσθέστε το CSS</h3>
+      <pre><code>&lt;!-- Φόρτωση CSS του widget --&gt;
+&lt;link rel="stylesheet" href="https://your-cdn.com/a11y-widget.css"&gt;</code></pre>
+
+      <h3>Βήμα 2: Προσθέστε το JavaScript</h3>
+      <pre><code>&lt;!-- Φόρτωση JS του widget --&gt;
+&lt;script src="https://your-cdn.com/a11y-widget.js"&gt;&lt;/script&gt;</code></pre>
+
+      <h3>Βήμα 3: Αρχικοποίηση (Προαιρετικό)</h3>
+      <p>Το widget αρχικοποιείται αυτόματα, αλλά μπορείτε να το ελέγξετε χειροκίνητα:</p>
+      <pre><code>&lt;script&gt;
+  // Αρχικοποίηση με προσαρμοσμένη θέση
+  window.initA11yWidget({
+    position: 'bottom-right' // ή 'bottom-left', 'top-right', 'top-left'
+  });
+&lt;/script&gt;</code></pre>
+
+      <div class="highlight-box">
+        <strong>💾 Αυτόματη Αποθήκευση:</strong> Όλες οι ρυθμίσεις αποθηκεύονται αυτόματα στο localStorage και παραμένουν ενεργές σε όλες τις επισκέψεις!
+      </div>
+    </section>
+
+    <section>
+      <h2>📦 Αρχεία Build</h2>
+      <p>Μετά το build, θα δημιουργηθούν τα εξής αρχεία στον φάκελο <code>dist-widget/</code>:</p>
+      <ul style="list-style-type: none; padding-left: 0;">
+        <li style="padding: 0.5rem; background: #e8f5e9; margin: 0.5rem 0; border-radius: 4px;">
+          ✅ <strong>a11y-widget.js</strong> (~492KB) - Το κύριο JavaScript bundle
+        </li>
+        <li style="padding: 0.5rem; background: #e8f5e9; margin: 0.5rem 0; border-radius: 4px;">
+          ✅ <strong>a11y-widget.css</strong> (~20KB) - Όλα τα styles του widget
+        </li>
+      </ul>
+      <p style="margin-top: 1rem;">Για να δημιουργήσετε τα αρχεία, εκτελέστε:</p>
+      <pre><code>npm run build:widget</code></pre>
+    </section>
+
+    <section>
+      <h2>🌐 Συμβατότητα Browser</h2>
+      <p>Το widget υποστηρίζει όλους τους σύγχρονους browsers:</p>
+      <ul style="padding-left: 2rem; color: #555;">
+        <li>Chrome / Edge 90+</li>
+        <li>Firefox 88+</li>
+        <li>Safari 14+</li>
+        <li>Mobile browsers με υποστήριξη Web Speech API</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>📝 Σημειώσεις</h2>
+      <ul style="padding-left: 2rem; color: #555; line-height: 1.8;">
+        <li>Το widget είναι πλήρως αυτόνομο - δεν χρειάζεται εγκατάσταση dependencies</li>
+        <li>Όλες οι ρυθμίσεις αποθηκεύονται τοπικά στον browser του χρήστη</li>
+        <li>Το widget σέβεται τη ρύθμιση <code>prefers-reduced-motion</code> του συστήματος</li>
+        <li>Πλήρως προσβάσιμο με πληκτρολόγιο (Tab, Esc, κλπ)</li>
+        <li>Δεν επηρεάζει το υπόλοιπο περιεχόμενο της σελίδας</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>🎨 A11y Widget - Σύγχρονο εργαλείο προσβασιμότητας για κάθε ιστοσελίδα</p>
+    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Δημιουργήθηκε με React, TypeScript & Tailwind CSS</p>
+  </footer>
+
+  <!-- Φόρτωση JS του widget -->
+  <script src="./dist-widget/a11y-widget.js"></script>
+
+  <!-- Το widget αρχικοποιείται αυτόματα! -->
+  <!-- Προαιρετικά, μπορείτε να το ελέγξετε χειροκίνητα:
+  <script>
+    window.initA11yWidget({ position: 'bottom-right' });
+  </script>
+  -->
+</body>
+</html>

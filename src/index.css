@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --line-height-scale: 1;
+    --letter-spacing-scale: 0em;
+    --cursor-size-scale: 1;
+  }
+
+  *:focus-visible {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  [data-a11y="on"] * {
+    line-height: calc(1.5 * var(--line-height-scale));
+    letter-spacing: var(--letter-spacing-scale);
+  }
+
+  [data-a11y="on"] {
+    cursor: auto;
+  }
+
+  [data-a11y="on"] * {
+    cursor: inherit;
+  }
+
+  [data-a11y="on"][data-high-contrast="true"] {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  [data-a11y="on"][data-high-contrast="true"] * {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+  }
+
+  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget button {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget > div[role="dialog"] {
+    background-color: #1a1a1a !important;
+    border-left: 2px solid #ffffff !important;
+  }
+
+  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget button,
+  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget input,
+  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget div {
+    border-color: #ffffff !important;
+  }
+
+  [data-a11y="on"][data-pause-animations="true"],
+  [data-a11y="on"][data-pause-animations="true"] * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  [data-a11y="on"][data-highlight-links="true"] a {
+    background-color: #fef08a !important;
+    color: #000000 !important;
+    text-decoration: underline !important;
+    text-decoration-thickness: 3px !important;
+    text-underline-offset: 2px !important;
+    padding: 2px 4px !important;
+    border-radius: 2px !important;
+  }
+
+  [data-a11y="on"][data-dyslexic-font="true"],
+  [data-a11y="on"][data-dyslexic-font="true"] * {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-weight: 600 !important;
+  }
+
+  [data-a11y="on"][data-hide-images="true"] img {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  [data-a11y="on"] button,
+  [data-a11y="on"] a,
+  [data-a11y="on"] [role="button"] {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* [data-a11y="on"][style*="--cursor-size-scale"] {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M3 3 L3 28 L12 20 L17 29 L21 27 L16 18 L26 18 Z" fill="black" stroke="white" stroke-width="1"/></svg>') 0 0, auto;
+  } */
+}
+
