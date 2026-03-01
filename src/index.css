@@ -2,65 +2,162 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Skip link (WCAG 2.4.1) ─── */
+.skip-to-main {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-to-main:focus {
+  position: fixed;
+  width: auto;
+  height: auto;
+  padding: 0.75rem 1.25rem;
+  margin: 0;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10000;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 0.5rem;
+  overflow: visible;
+  clip: auto;
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+/* ─── Screen reader only ─── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 @layer base {
   :root {
     --line-height-scale: 1;
     --letter-spacing-scale: 0em;
+    --word-spacing-scale: 0em;
     --cursor-size-scale: 1;
   }
 
+  /* ─── Focus (WCAG 2.4.7 / 2.4.13 Focus Appearance) ─── */
   *:focus-visible {
-    outline: 3px solid #3b82f6;
+    outline: 3px solid #2563eb;
     outline-offset: 2px;
   }
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
 
+  /* ─── Text Spacing (WCAG 1.4.12) ─── */
   [data-a11y="on"] * {
     line-height: calc(1.5 * var(--line-height-scale));
     letter-spacing: var(--letter-spacing-scale);
+    word-spacing: var(--word-spacing-scale);
   }
 
+  /* ─── Cursor ─── */
   [data-a11y="on"] {
     cursor: auto;
   }
-
   [data-a11y="on"] * {
     cursor: inherit;
   }
 
+  /* ─── High Contrast (WCAG 1.4.3 / 1.4.6) ─── */
   [data-a11y="on"][data-high-contrast="true"] {
-    background-color: #000000 !important;
-    color: #ffffff !important;
+    background-color: #000 !important;
+    color: #fff !important;
   }
-
   [data-a11y="on"][data-high-contrast="true"] * {
-    background-color: #000000 !important;
-    color: #ffffff !important;
-    border-color: #ffffff !important;
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
   }
-
+  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget [role="dialog"] {
+    background-color: #111 !important;
+    border-left: 2px solid #fff !important;
+  }
   [data-a11y="on"][data-high-contrast="true"] .accessibility-widget button {
-    background-color: #ffffff !important;
-    color: #000000 !important;
+    background-color: #222 !important;
+    color: #fff !important;
+    border-color: #555 !important;
+  }
+  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget button[aria-pressed="true"],
+  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget .active-tile {
+    background-color: #1a3a6a !important;
+    border-color: #93c5fd !important;
   }
 
-  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget > div[role="dialog"] {
-    background-color: #1a1a1a !important;
-    border-left: 2px solid #ffffff !important;
+  /* ─── Invert Colors (WCAG 1.4.3) – μόνο στο περιεχόμενο, όχι στο widget ─── */
+  [data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap {
+    filter: invert(1) hue-rotate(180deg);
+  }
+  [data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap img,
+  [data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap video,
+  [data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap svg {
+    filter: invert(1) hue-rotate(180deg);
   }
 
-  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget button,
-  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget input,
-  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget div {
-    border-color: #ffffff !important;
+  /* ─── Saturation (WCAG 1.4.1) – μόνο στο περιεχόμενο ─── */
+  [data-a11y="on"][data-saturation="low"] .a11y-content-wrap {
+    filter: saturate(0.3);
+  }
+  [data-a11y="on"][data-saturation="high"] .a11y-content-wrap {
+    filter: saturate(2);
+  }
+  [data-a11y="on"][data-saturation="monochrome"] .a11y-content-wrap {
+    filter: grayscale(1);
   }
 
+  /* ─── Color Overlay – μόνο πάνω στο περιεχόμενο, ώστε το widget να μένει κλικάρι ─── */
+  [data-a11y="on"][data-color-overlay] .a11y-content-wrap {
+    position: relative;
+  }
+  [data-a11y="on"][data-color-overlay] .a11y-content-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+  [data-a11y="on"][data-color-overlay="yellow"] .a11y-content-wrap::before {
+    background: rgba(255, 255, 100, 0.15);
+  }
+  [data-a11y="on"][data-color-overlay="blue"] .a11y-content-wrap::before {
+    background: rgba(100, 150, 255, 0.12);
+  }
+  [data-a11y="on"][data-color-overlay="green"] .a11y-content-wrap::before {
+    background: rgba(100, 255, 130, 0.1);
+  }
+  [data-a11y="on"][data-color-overlay="pink"] .a11y-content-wrap::before {
+    background: rgba(255, 130, 180, 0.1);
+  }
+
+  /* ─── Pause Animations (WCAG 2.2.2 / 2.3.3) ─── */
   [data-a11y="on"][data-pause-animations="true"],
   [data-a11y="on"][data-pause-animations="true"] * {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -71,39 +168,136 @@
     }
   }
 
+  /* ─── Highlight Links (WCAG 2.4.4 / 1.4.1) ─── */
   [data-a11y="on"][data-highlight-links="true"] a {
     background-color: #fef08a !important;
-    color: #000000 !important;
+    color: #000 !important;
     text-decoration: underline !important;
     text-decoration-thickness: 3px !important;
-    text-underline-offset: 2px !important;
+    text-underline-offset: 3px !important;
     padding: 2px 4px !important;
+    border-radius: 3px !important;
+    outline: 2px solid #eab308 !important;
+  }
+  [data-a11y="on"][data-highlight-links="true"] .accessibility-widget a {
+    background-color: transparent !important;
+    outline: none !important;
+  }
+
+  /* ─── Highlight Headings (WCAG 1.3.1 Info and Relationships) ─── */
+  [data-a11y="on"][data-highlight-headings="true"] h1,
+  [data-a11y="on"][data-highlight-headings="true"] h2,
+  [data-a11y="on"][data-highlight-headings="true"] h3,
+  [data-a11y="on"][data-highlight-headings="true"] h4,
+  [data-a11y="on"][data-highlight-headings="true"] h5,
+  [data-a11y="on"][data-highlight-headings="true"] h6 {
+    border-bottom: 3px solid #3b82f6 !important;
+    padding-bottom: 4px !important;
+    background: linear-gradient(to right, rgba(59, 130, 246, 0.08), transparent) !important;
+    padding-left: 8px !important;
+    border-left: 4px solid #3b82f6 !important;
     border-radius: 2px !important;
   }
+  [data-a11y="on"][data-highlight-headings="true"] .accessibility-widget h1,
+  [data-a11y="on"][data-highlight-headings="true"] .accessibility-widget h2,
+  [data-a11y="on"][data-highlight-headings="true"] .accessibility-widget h3 {
+    border: none !important;
+    background: transparent !important;
+    padding-left: 0 !important;
+  }
 
+  /* ─── Dyslexic Font (WCAG 1.4.12) ─── */
   [data-a11y="on"][data-dyslexic-font="true"],
   [data-a11y="on"][data-dyslexic-font="true"] * {
-    font-family: Arial, Helvetica, sans-serif !important;
-    font-weight: 600 !important;
+    font-family: 'Comic Sans MS', 'OpenDyslexic', Arial, Helvetica, sans-serif !important;
+    font-weight: 500 !important;
   }
 
-  [data-a11y="on"][data-hide-images="true"] img {
-    opacity: 0 !important;
+  /* ─── Hide Images (WCAG 1.1.1) ─── */
+  [data-a11y="on"][data-hide-images="true"] img,
+  [data-a11y="on"][data-hide-images="true"] svg:not(.a11y-icon),
+  [data-a11y="on"][data-hide-images="true"] video,
+  [data-a11y="on"][data-hide-images="true"] picture {
+    opacity: 0.05 !important;
     pointer-events: none !important;
   }
-
-  [data-a11y="on"] button,
-  [data-a11y="on"] a,
-  [data-a11y="on"] [role="button"] {
-    min-width: 44px !important;
-    min-height: 44px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+  [data-a11y="on"][data-hide-images="true"] .accessibility-widget img,
+  [data-a11y="on"][data-hide-images="true"] .accessibility-widget svg {
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
 
-  /* [data-a11y="on"][style*="--cursor-size-scale"] {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M3 3 L3 28 L12 20 L17 29 L21 27 L16 18 L26 18 Z" fill="black" stroke="white" stroke-width="1"/></svg>') 0 0, auto;
-  } */
-}
+  /* ─── Text Align (WCAG 1.4.8 Visual Presentation) ─── */
+  [data-a11y="on"][data-text-align="left"] * {
+    text-align: left !important;
+  }
+  [data-a11y="on"][data-text-align="center"] * {
+    text-align: center !important;
+  }
+  [data-a11y="on"][data-text-align="right"] * {
+    text-align: right !important;
+  }
+  [data-a11y="on"][data-text-align] .accessibility-widget * {
+    text-align: initial !important;
+  }
 
+  /* ─── Focus Highlight Enhanced (WCAG 2.4.7 / 2.4.13 Focus Appearance) ─── */
+  [data-a11y="on"][data-focus-highlight="true"] *:focus-visible {
+    outline: 4px solid #ef4444 !important;
+    outline-offset: 4px !important;
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.3) !important;
+  }
+
+  /* ─── Target Size (WCAG 2.5.5 / 2.5.8 – 44×44px AAA) ─── */
+  [data-a11y="on"] button,
+  [data-a11y="on"] a,
+  [data-a11y="on"] [role="button"],
+  [data-a11y="on"] input[type="checkbox"],
+  [data-a11y="on"] input[type="radio"] {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+
+  /* ─── Cursor Size (motor accessibility) ─── */
+  [data-a11y="on"][data-cursor-size="large"],
+  [data-a11y="on"][data-cursor-size="large"] * {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><path d="M4 4 L4 42 L18 30 L26 44 L32 40 L24 27 L40 27 Z" fill="black" stroke="white" stroke-width="2"/></svg>') 0 0, auto !important;
+  }
+  [data-a11y="on"][data-cursor-size="xlarge"],
+  [data-a11y="on"][data-cursor-size="xlarge"] * {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><path d="M5 5 L5 56 L24 40 L34 58 L42 54 L32 36 L52 36 Z" fill="black" stroke="white" stroke-width="3"/></svg>') 0 0, auto !important;
+  }
+
+  /* Override cursor inside widget */
+  .accessibility-widget,
+  .accessibility-widget * {
+    cursor: pointer !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .accessibility-widget [role="dialog"] {
+      transition: none !important;
+    }
+  }
+
+  /* ─── Reading Mask overlay ─── */
+  .reading-mask-top,
+  .reading-mask-bottom {
+    position: fixed;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.65);
+    pointer-events: none;
+    z-index: 9996;
+    transition: top 0.05s linear, bottom 0.05s linear, height 0.05s linear;
+  }
+
+  /* ─── Widget trigger pulse animation ─── */
+  @keyframes a11y-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
+    50% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+  }
+  .a11y-trigger-pulse {
+    animation: a11y-pulse 2.5s ease-in-out infinite;
+  }
+}

@@ -5,8 +5,10 @@ export function useReadingGuide() {
   const { settings } = useAccessibility();
   const [position, setPosition] = useState({ y: 0 });
 
+  const needsTracking = settings.readingGuide || settings.readingMask;
+
   useEffect(() => {
-    if (!settings.readingGuide) return;
+    if (!needsTracking) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       setPosition({ y: e.clientY });
@@ -14,7 +16,7 @@ export function useReadingGuide() {
 
     document.addEventListener('mousemove', handleMouseMove);
     return () => document.removeEventListener('mousemove', handleMouseMove);
-  }, [settings.readingGuide]);
+  }, [needsTracking]);
 
   return { enabled: settings.readingGuide, position };
 }

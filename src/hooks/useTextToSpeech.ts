@@ -21,7 +21,8 @@ export function useTextToSpeech() {
     }
 
     const utterance = new SpeechSynthesisUtterance(textContent);
-    utterance.lang = 'el-GR';
+    const langCode = settings.language === 'el' ? 'el-GR' : settings.language === 'de' ? 'de-DE' : 'en-GB';
+    utterance.lang = langCode;
     utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.volume = 1;
@@ -39,7 +40,7 @@ export function useTextToSpeech() {
     };
 
     window.speechSynthesis.speak(utterance);
-  }, [updateSetting]);
+  }, [updateSetting, settings.language]);
 
   const stop = useCallback(() => {
     if ('speechSynthesis' in window) {

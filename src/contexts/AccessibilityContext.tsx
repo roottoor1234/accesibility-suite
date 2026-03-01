@@ -1,16 +1,27 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-interface AccessibilitySettings {
+export type AppLocale = 'el' | 'en' | 'de';
+
+export interface AccessibilitySettings {
+  language: AppLocale;
   textSize: number;
   highContrast: boolean;
+  invertColors: boolean;
+  saturation: 'normal' | 'low' | 'high' | 'monochrome';
+  colorOverlay: 'none' | 'yellow' | 'blue' | 'green' | 'pink';
   pauseAnimations: boolean;
   highlightLinks: boolean;
+  highlightHeadings: boolean;
   readingGuide: boolean;
+  readingMask: boolean;
   dyslexicFont: boolean;
   hideImages: boolean;
   lineHeight: number;
   letterSpacing: number;
+  wordSpacing: number;
+  textAlign: 'default' | 'left' | 'center' | 'right';
   cursorSize: number;
+  focusHighlight: boolean;
   isSpeaking: boolean;
 }
 
@@ -21,21 +32,54 @@ interface AccessibilityContextType {
     value: AccessibilitySettings[K]
   ) => void;
   resetAll: () => void;
+  activeCount: number;
 }
 
 const defaultSettings: AccessibilitySettings = {
+  language: 'el',
   textSize: 100,
   highContrast: false,
+  invertColors: false,
+  saturation: 'normal',
+  colorOverlay: 'none',
   pauseAnimations: false,
   highlightLinks: false,
+  highlightHeadings: false,
   readingGuide: false,
+  readingMask: false,
   dyslexicFont: false,
   hideImages: false,
   lineHeight: 100,
   letterSpacing: 100,
+  wordSpacing: 100,
+  textAlign: 'default',
   cursorSize: 100,
+  focusHighlight: false,
   isSpeaking: false,
 };
+
+function countActive(s: AccessibilitySettings): number {
+  let count = 0;
+  if (s.textSize !== 100) count++;
+  if (s.highContrast) count++;
+  if (s.invertColors) count++;
+  if (s.saturation !== 'normal') count++;
+  if (s.colorOverlay !== 'none') count++;
+  if (s.pauseAnimations) count++;
+  if (s.highlightLinks) count++;
+  if (s.highlightHeadings) count++;
+  if (s.readingGuide) count++;
+  if (s.readingMask) count++;
+  if (s.dyslexicFont) count++;
+  if (s.hideImages) count++;
+  if (s.lineHeight !== 100) count++;
+  if (s.letterSpacing !== 100) count++;
+  if (s.wordSpacing !== 100) count++;
+  if (s.textAlign !== 'default') count++;
+  if (s.cursorSize !== 100) count++;
+  if (s.focusHighlight) count++;
+  return count;
+}
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
 
@@ -53,14 +97,17 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    const toStore = { ...settings, isSpeaking: undefined };
-    localStorage.setItem('accessibility-settings', JSON.stringify(toStore));
+    const { isSpeaking: _, ...persistable } = settings;
+    localStorage.setItem('accessibility-settings', JSON.stringify(persistable));
     applySettings(settings);
   }, [settings]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-a11y', 'on');
   }, []);
+
+  // Γλώσσα widget: ΜΟΝΟ το UI του widget (όχι το κείμενο της σελίδας του πελάτη).
+  // Το document.documentElement.lang αφήνεται όπως το έχει η σελίδα.
 
   const updateSetting = <K extends keyof AccessibilitySettings>(
     key: K,
@@ -75,7 +122,7 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AccessibilityContext.Provider value={{ settings, updateSetting, resetAll }}>
+    <AccessibilityContext.Provider value={{ settings, updateSetting, resetAll, activeCount: countActive(settings) }}>
       {children}
     </AccessibilityContext.Provider>
   );
@@ -89,48 +136,41 @@ export function useAccessibility() {
   return context;
 }
 
-function applySettings(settings: AccessibilitySettings) {
+function setAttr(el: HTMLElement, attr: string, on: boolean) {
+  if (on) el.setAttribute(attr, 'true');
+  else el.removeAttribute(attr);
+}
+
+function applySettings(s: AccessibilitySettings) {
   const root = document.documentElement;
 
-  root.style.fontSize = `${settings.textSize}%`;
+  root.style.fontSize = `${s.textSize}%`;
 
-  if (settings.highContrast) {
-    root.setAttribute('data-high-contrast', 'true');
-  } else {
-    root.removeAttribute('data-high-contrast');
-  }
+  setAttr(root, 'data-high-contrast', s.highContrast);
+  setAttr(root, 'data-invert-colors', s.invertColors);
+  setAttr(root, 'data-pause-animations', s.pauseAnimations);
+  setAttr(root, 'data-highlight-links', s.highlightLinks);
+  setAttr(root, 'data-highlight-headings', s.highlightHeadings);
+  setAttr(root, 'data-reading-guide', s.readingGuide);
+  setAttr(root, 'data-reading-mask', s.readingMask);
+  setAttr(root, 'data-dyslexic-font', s.dyslexicFont);
+  setAttr(root, 'data-hide-images', s.hideImages);
+  setAttr(root, 'data-focus-highlight', s.focusHighlight);
 
-  if (settings.pauseAnimations) {
-    root.setAttribute('data-pause-animations', 'true');
-  } else {
-    root.removeAttribute('data-pause-animations');
-  }
+  if (s.saturation !== 'normal') root.setAttribute('data-saturation', s.saturation);
+  else root.removeAttribute('data-saturation');
 
-  if (settings.highlightLinks) {
-    root.setAttribute('data-highlight-links', 'true');
-  } else {
-    root.removeAttribute('data-highlight-links');
-  }
+  if (s.colorOverlay !== 'none') root.setAttribute('data-color-overlay', s.colorOverlay);
+  else root.removeAttribute('data-color-overlay');
 
-  if (settings.readingGuide) {
-    root.setAttribute('data-reading-guide', 'true');
-  } else {
-    root.removeAttribute('data-reading-guide');
-  }
+  if (s.textAlign !== 'default') root.setAttribute('data-text-align', s.textAlign);
+  else root.removeAttribute('data-text-align');
 
-  if (settings.dyslexicFont) {
-    root.setAttribute('data-dyslexic-font', 'true');
-  } else {
-    root.removeAttribute('data-dyslexic-font');
-  }
+  root.style.setProperty('--line-height-scale', `${s.lineHeight / 100}`);
+  root.style.setProperty('--letter-spacing-scale', `${(s.letterSpacing - 100) / 100}em`);
+  root.style.setProperty('--word-spacing-scale', `${(s.wordSpacing - 100) / 100}em`);
 
-  if (settings.hideImages) {
-    root.setAttribute('data-hide-images', 'true');
-  } else {
-    root.removeAttribute('data-hide-images');
-  }
-
-  root.style.setProperty('--line-height-scale', `${settings.lineHeight / 100}`);
-  root.style.setProperty('--letter-spacing-scale', `${(settings.letterSpacing - 100) / 100}em`);
-  root.style.setProperty('--cursor-size-scale', `${settings.cursorSize / 100}`);
+  if (s.cursorSize >= 200) root.setAttribute('data-cursor-size', 'xlarge');
+  else if (s.cursorSize > 100) root.setAttribute('data-cursor-size', 'large');
+  else root.removeAttribute('data-cursor-size');
 }

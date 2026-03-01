@@ -1,21 +1,32 @@
 import { createRoot } from 'react-dom/client';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
-import { AccessibilityWidget } from './components/AccessibilityWidget';
+import { AccessibilityWidget, type WidgetPosition } from './components/AccessibilityWidget';
 import './widget-styles.css';
 
 declare global {
   interface Window {
-    initA11yWidget: (options?: { position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' }) => void;
+    initA11yWidget: (options?: { position?: WidgetPosition }) => void;
   }
 }
 
 window.initA11yWidget = (options = {}) => {
-  const { position = 'bottom-right' } = options;
+  const { position = 'bottom-left' } = options;
 
   const existingContainer = document.getElementById('a11y-widget-container');
   if (existingContainer) {
     console.warn('A11y Widget is already initialized');
     return;
+  }
+
+  /* Τυλίγουμε το υπάρχον περιεχόμενο του body ώστε invert/επικάλυψη να μην πιάνουν το widget */
+  if (!document.body.querySelector('.a11y-content-wrap')) {
+    const wrap = document.createElement('div');
+    wrap.className = 'a11y-content-wrap';
+    wrap.style.minHeight = '100vh';
+    while (document.body.firstChild) {
+      wrap.appendChild(document.body.firstChild);
+    }
+    document.body.appendChild(wrap);
   }
 
   const container = document.createElement('div');
@@ -32,7 +43,7 @@ window.initA11yWidget = (options = {}) => {
     'top-left': { top: '0', left: '0' },
   };
 
-  const styles = positionStyles[position] || positionStyles['bottom-right'];
+  const styles = positionStyles[position] || positionStyles['bottom-left'];
   Object.assign(container.style, styles);
 
   document.body.appendChild(container);
@@ -40,7 +51,7 @@ window.initA11yWidget = (options = {}) => {
   const root = createRoot(container);
   root.render(
     <AccessibilityProvider>
-      <AccessibilityWidget />
+      <AccessibilityWidget position={position} />
     </AccessibilityProvider>
   );
 };
