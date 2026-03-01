@@ -9,6 +9,8 @@ export default defineConfig({
   define: {
     'process.env': '{}',
     'process.env.NODE_ENV': '"production"',
+    // Ορίζεις A11Y_LICENSE_API=https://api.yoursite.com/a11y/validate πριν το build
+    __A11Y_LICENSE_API__: JSON.stringify(process.env.A11Y_LICENSE_API || ''),
   },
   build: {
     lib: {

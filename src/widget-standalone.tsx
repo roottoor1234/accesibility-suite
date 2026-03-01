@@ -1,6 +1,13 @@
 import { createRoot } from 'react-dom/client';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import { AccessibilityWidget, type WidgetPosition } from './components/AccessibilityWidget';
+import {
+  getLicenseKeyFromPage,
+  getCurrentDomain,
+  validateLicense,
+  isLicenseCheckEnabled,
+  getLicenseApiUrl,
+} from './lib/license';
 import './widget-styles.css';
 
 declare global {
@@ -9,9 +16,7 @@ declare global {
   }
 }
 
-window.initA11yWidget = (options = {}) => {
-  const { position = 'bottom-left' } = options;
-
+function mountWidget(position: WidgetPosition = 'bottom-left') {
   const existingContainer = document.getElementById('a11y-widget-container');
   if (existingContainer) {
     console.warn('A11y Widget is already initialized');
@@ -54,12 +59,35 @@ window.initA11yWidget = (options = {}) => {
       <AccessibilityWidget position={position} />
     </AccessibilityProvider>
   );
+}
+
+window.initA11yWidget = (options = {}) => {
+  mountWidget(options.position);
 };
+
+async function bootstrap() {
+  const position: WidgetPosition = 'bottom-left';
+
+  if (isLicenseCheckEnabled()) {
+    const key = getLicenseKeyFromPage();
+    if (!key) {
+      return; // Χωρίς key δεν φορτώνει το widget
+    }
+    const apiUrl = getLicenseApiUrl();
+    const domain = getCurrentDomain();
+    const result = await validateLicense(apiUrl, key, domain);
+    if (!result.valid) {
+      return; // Invalid license → δεν εμφανίζουμε widget
+    }
+  }
+
+  mountWidget(position);
+}
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    window.initA11yWidget();
+    bootstrap();
   });
 } else {
-  window.initA11yWidget();
+  bootstrap();
 }

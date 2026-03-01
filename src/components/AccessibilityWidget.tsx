@@ -29,6 +29,8 @@ import { useAccessibility } from "../contexts/AccessibilityContext";
 import { useTextToSpeech } from "../hooks/useTextToSpeech";
 import { ReadingGuide } from "./ReadingGuide";
 import { t, type TranslationKey } from "../i18n/translations";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export type WidgetPosition =
   | "bottom-right"
@@ -208,92 +210,96 @@ export function AccessibilityWidget({
         className={`accessibility-widget fixed ${positionClasses[position]} z-[9999]`}
         lang={settings.language}
       >
-        {/* ═══ Trigger Button ═══ */}
-        <button
-          ref={buttonRef}
-          onClick={() => setIsOpen(!isOpen)}
-          className={`
-            relative w-16 h-16 rounded-2xl text-white shadow-xl
-            focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 focus-visible:ring-offset-2
-            transition-all duration-300 flex items-center justify-center group
-            bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700
-            hover:from-blue-500 hover:via-indigo-500 hover:to-purple-600
-            hover:shadow-2xl hover:scale-105
-            ${activeCount === 0 ? "a11y-trigger-pulse" : ""}
-          `}
-          aria-label={isOpen ? L("closeMenu") : L("openMenu")}
-          aria-expanded={isOpen}
+        <Sheet
+          open={isOpen}
+          onOpenChange={(open) => {
+            setIsOpen(open);
+            if (!open) {
+              setLangDropdownOpen(false);
+              buttonRef.current?.focus();
+            }
+          }}
         >
-          <Accessibility className="w-7 h-7 group-hover:scale-110 transition-transform drop-shadow-md" />
-          {activeCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center shadow-lg ring-2 ring-white">
-              {activeCount}
-            </span>
-          )}
-        </button>
-
-        {/* ═══ Panel ═══ */}
-        {isOpen && (
-          <>
-            <div
-              className="fixed inset-0 bg-black/25 z-[9998]"
-              onClick={handleClose}
-              aria-hidden="true"
-            />
-
-            <div
-              ref={panelRef}
-              className="fixed top-0 left-0 h-full w-full max-w-[420px] bg-gray-50 shadow-2xl overflow-y-auto z-[9999] transition-transform duration-300 ease-out"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="a11y-panel-title"
+          <SheetTrigger asChild>
+            <Button
+              ref={buttonRef}
+              size="icon"
+              className={`
+                relative w-16 h-16 rounded-2xl text-white shadow-xl
+                focus-visible:ring-4 focus-visible:ring-blue-300 focus-visible:ring-offset-2
+                transition-all duration-300
+                bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700
+                hover:from-blue-500 hover:via-indigo-500 hover:to-purple-600
+                hover:shadow-2xl hover:scale-105 border-0
+                ${activeCount === 0 ? "a11y-trigger-pulse" : ""}
+              `}
+              aria-label={isOpen ? L("closeMenu") : L("openMenu")}
+              aria-expanded={isOpen}
             >
-              {/* ── Header ── */}
-              <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 px-5 py-4 flex items-center justify-between shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-                    <Accessibility className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h2
-                      id="a11y-panel-title"
-                      className="text-lg font-bold text-white leading-tight"
-                    >
-                      {L("a11y")}
-                    </h2>
-                    <p className="text-xs text-blue-100">
-                      {L("wcag22")}
-                      {activeCount > 0 && (
-                        <span className="ml-2 px-1.5 py-0.5 bg-white/20 rounded text-white font-semibold">
-                          {activeCount} {activeCount === 1 ? L("activeOne") : L("activeMany")}
-                        </span>
-                      )}
-                    </p>
-                  </div>
+              <Accessibility className="w-7 h-7 drop-shadow-md" />
+              {activeCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center shadow-lg ring-2 ring-white">
+                  {activeCount}
+                </span>
+              )}
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            ref={panelRef}
+            side="left"
+            className="w-full max-w-[420px] p-0 flex flex-col bg-gray-50 border-0 [&>:first-child]:hidden"
+            aria-labelledby="a11y-panel-title"
+          >
+            {/* ── Header ── */}
+            <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 px-5 py-4 flex items-center justify-between shadow-lg shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                  <Accessibility className="w-5 h-5 text-white" />
                 </div>
-                <button
-                  id="a11y-close-btn"
-                  onClick={handleClose}
-                  className="w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white flex items-center justify-center transition-colors"
-                  aria-label={L("closePanel")}
-                >
-                  <X className="w-5 h-5 text-white" />
-                </button>
+                <div>
+                  <h2
+                    id="a11y-panel-title"
+                    className="text-lg font-bold text-white leading-tight"
+                  >
+                    {L("a11y")}
+                  </h2>
+                  <p className="text-xs text-blue-100">
+                    {L("wcag22")}
+                    {activeCount > 0 && (
+                      <span className="ml-2 px-1.5 py-0.5 bg-white/20 rounded text-white font-semibold">
+                        {activeCount} {activeCount === 1 ? L("activeOne") : L("activeMany")}
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
+              <Button
+                id="a11y-close-btn"
+                variant="ghost"
+                size="icon"
+                onClick={handleClose}
+                className="w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 text-white hover:text-white focus-visible:ring-white"
+                aria-label={L("closePanel")}
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
 
+            <div className="flex-1 overflow-y-auto">
               <div className="p-4 space-y-5">
                 {/* ════════ Γλώσσα: WCAG 2.1.1 dropdown με σημαίες ════════ */}
                 <Section title={L("language")}>
                   <div className="relative">
-                    <button
+                    <Button
                       ref={langTriggerRef}
+                      variant="outline"
                       type="button"
                       aria-haspopup="listbox"
                       aria-expanded={langDropdownOpen}
                       aria-controls={langListId}
                       id={`${langListId}-trigger`}
                       onClick={() => setLangDropdownOpen((v) => !v)}
-                      className="w-full min-h-[48px] flex items-center justify-between gap-3 px-4 py-3 rounded-xl border-2 border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors text-left"
+                      className="w-full min-h-[48px] justify-between gap-3 px-4 py-3 rounded-xl border-2 text-left"
                       aria-label={L("language")}
                     >
                       <span className="flex items-center gap-3">
@@ -308,7 +314,7 @@ export function AccessibilityWidget({
                       >
                         ▼
                       </span>
-                    </button>
+                    </Button>
 
                     {langDropdownOpen && (
                       <ul
@@ -404,20 +410,16 @@ export function AccessibilityWidget({
                   <OptionRow label={L("saturation")} icon={<Palette className="w-4 h-4" />}>
                     <div className="flex gap-1.5 flex-wrap">
                       {satOpts.map((o) => (
-                        <button
+                        <Button
                           key={o}
-                          type="button"
+                          size="sm"
+                          variant={settings.saturation === o ? "default" : "outline"}
                           onClick={() => updateSetting("saturation", o)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all min-h-[36px]
-                            ${
-                              settings.saturation === o
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-                            }`}
+                          className="min-h-[36px]"
                           aria-pressed={settings.saturation === o}
                         >
                           {L(satKey[o])}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </OptionRow>
@@ -425,20 +427,16 @@ export function AccessibilityWidget({
                   <OptionRow label={L("colorOverlay")} icon={<Layers className="w-4 h-4" />}>
                     <div className="flex gap-1.5 flex-wrap">
                       {overlayOpts.map((o) => (
-                        <button
+                        <Button
                           key={o}
-                          type="button"
+                          size="sm"
+                          variant={settings.colorOverlay === o ? "default" : "outline"}
                           onClick={() => updateSetting("colorOverlay", o)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all min-h-[36px]
-                            ${
-                              settings.colorOverlay === o
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-                            }`}
+                          className="min-h-[36px]"
                           aria-pressed={settings.colorOverlay === o}
                         >
                           {L(overlayKey[o])}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </OptionRow>
@@ -519,21 +517,17 @@ export function AccessibilityWidget({
                   <OptionRow label={L("textAlign")} icon={<AlignLeft className="w-4 h-4" />}>
                     <div className="flex gap-1.5">
                       {alignOpts.map((o) => (
-                        <button
+                        <Button
                           key={o}
-                          type="button"
+                          size="sm"
+                          variant={settings.textAlign === o ? "default" : "outline"}
                           onClick={() => updateSetting("textAlign", o)}
-                          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all min-h-[36px]
-                            ${
-                              settings.textAlign === o
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-                            }`}
+                          className="min-h-[36px] gap-1.5"
                           aria-pressed={settings.textAlign === o}
                         >
                           {AlignIcons[o]}
                           {L(alignKey[o])}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </OptionRow>
@@ -596,18 +590,11 @@ export function AccessibilityWidget({
                 </Section>
 
                 <Section title={L("sectionSpeech")}>
-                  <button
+                  <Button
                     type="button"
+                    variant={isSpeaking ? "destructive" : "default"}
                     onClick={isSpeaking ? stop : speak}
-                    className={`
-                      w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl font-semibold text-sm transition-all
-                      focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 min-h-[48px]
-                      ${
-                        isSpeaking
-                          ? "bg-red-500 hover:bg-red-600 text-white shadow-md"
-                          : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md"
-                      }
-                    `}
+                    className={`w-full gap-3 py-3.5 min-h-[48px] ${!isSpeaking ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border-0" : ""}`}
                     aria-pressed={isSpeaking}
                   >
                     {isSpeaking ? (
@@ -621,7 +608,7 @@ export function AccessibilityWidget({
                         {L("readPage")}
                       </>
                     )}
-                  </button>
+                  </Button>
                 </Section>
 
                 <div className="pt-3 border-t border-gray-200">
@@ -632,8 +619,9 @@ export function AccessibilityWidget({
                     className="sr-only"
                     id="a11y-reset-status"
                   />
-                  <button
-                    type="button"
+                  <Button
+                    variant="outline"
+                    className="w-full py-3 min-h-[48px] gap-2"
                     onClick={() => {
                       stop();
                       resetAll();
@@ -645,20 +633,19 @@ export function AccessibilityWidget({
                         });
                       }
                     }}
-                    className="w-full py-3 px-4 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl font-semibold text-gray-600 flex items-center justify-center gap-2 min-h-[48px] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-all hover:shadow-sm"
                   >
                     <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     {L("resetAll")}
-                  </button>
+                  </Button>
                 </div>
 
-                <p className="text-[11px] text-gray-400 text-center pb-2">
+                <p className="text-[11px] text-gray-500 text-center pb-2">
                   {L("disclaimer")}
                 </p>
               </div>
             </div>
-          </>
-        )}
+          </SheetContent>
+        </Sheet>
       </div>
     </>
   );
@@ -677,7 +664,7 @@ function Section({
 }) {
   return (
     <section aria-label={title}>
-      <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2.5 px-0.5">
+      <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-600 mb-2.5 px-0.5">
         {title}
       </h3>
       <div className="space-y-2.5">{children}</div>
@@ -697,35 +684,28 @@ function ToggleTile({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant={active ? "default" : "outline"}
       onClick={onClick}
       className={`
-        p-3.5 rounded-xl border transition-all duration-150 text-left w-full
-        flex items-start gap-3 min-h-[72px]
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
-        ${
-          active
-            ? "border-blue-500 bg-blue-50 text-blue-900 shadow-sm active-tile"
-            : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm"
-        }
+        p-3.5 rounded-xl h-auto min-h-[72px] w-full justify-start gap-3
+        ${active ? "active-tile" : "bg-white hover:bg-gray-50"}
       `}
       aria-pressed={active}
     >
-      <div
-        className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
-          active
-            ? "bg-blue-600 text-white"
-            : "bg-gray-100 text-gray-500"
+      <span
+        className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${
+          active ? "bg-primary-foreground/20" : "bg-muted"
         }`}
         aria-hidden="true"
       >
         {icon}
-      </div>
-      <span className="text-xs font-semibold leading-tight pt-1.5">
+      </span>
+      <span className="text-xs font-semibold leading-tight pt-1.5 text-left">
         {label}
       </span>
-    </button>
+    </Button>
   );
 }
 
@@ -775,27 +755,31 @@ function SliderRow({
         {label}
       </span>
       <div className="flex items-center gap-2 ml-auto">
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="icon"
+          className="h-8 w-8"
           onClick={() => onChange(Math.max(min, value - step))}
           disabled={value <= min}
-          className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-sm font-bold text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-colors"
           aria-label={ariaLabelMinus}
         >
           &minus;
-        </button>
-        <span className="text-xs font-bold text-gray-800 w-12 text-center tabular-nums">
+        </Button>
+        <span className="text-xs font-bold w-12 text-center tabular-nums">
           {value}{unit}
         </span>
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="icon"
+          className="h-8 w-8"
           onClick={() => onChange(Math.min(max, value + step))}
           disabled={value >= max}
-          className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-sm font-bold text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-colors"
           aria-label={ariaLabelPlus}
         >
           +
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -815,11 +799,11 @@ function OptionRow({
     <div
       role="group"
       aria-labelledby={`${id}-label`}
-      className="p-3 rounded-xl border border-gray-100 bg-white space-y-2"
+      className="p-3 rounded-xl border border-gray-200 bg-white space-y-2"
     >
       <div className="flex items-center gap-2">
-        <span className="text-gray-400" aria-hidden="true">{icon}</span>
-        <span id={`${id}-label`} className="text-xs font-semibold text-gray-700">
+        <span className="text-gray-500" aria-hidden="true">{icon}</span>
+        <span id={`${id}-label`} className="text-xs font-semibold text-gray-800">
           {label}
         </span>
       </div>

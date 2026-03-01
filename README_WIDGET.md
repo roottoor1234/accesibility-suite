@@ -28,11 +28,17 @@ npm run build:widget
 <!-- Φόρτωση CSS -->
 <link rel="stylesheet" href="https://your-cdn.com/a11y-widget.css">
 
-<!-- Φόρτωση JavaScript -->
-<script src="https://your-cdn.com/a11y-widget.js"></script>
+<!-- Φόρτωση JavaScript (με license key για production) -->
+<script
+  src="https://your-cdn.com/a11y-widget.js"
+  data-license-key="YOUR-LICENSE-KEY"
+></script>
 ```
 
-Αυτό είναι όλο! Το widget θα εμφανιστεί αυτόματα στην κάτω δεξιά γωνία.
+- **Χωρίς license API στο build:** το widget φορτώνει πάντα (κατάλληλο για dev/demo).
+- **Με license API στο build:** το widget φορτώνει μόνο αν το `data-license-key` είναι έγκυρο για το domain της σελίδας. Λεπτομέρειες: [docs/LICENSE_API.md](docs/LICENSE_API.md).
+
+Τιμές και πακέτα: [docs/PRICING.md](docs/PRICING.md).
 
 ### Προαιρετική Χειροκίνητη Αρχικοποίηση
 
