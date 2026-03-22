@@ -35,6 +35,10 @@ interface AccessibilityContextType {
   activeCount: number;
 }
 
+/** Namespace ώστε να μη συγκρούεται με άλλα scripts που χρησιμοποιούν `accessibility-settings`. */
+const LS_KEY = 'a11y-widget-settings';
+const LS_KEY_LEGACY = 'accessibility-settings';
+
 const defaultSettings: AccessibilitySettings = {
   language: 'el',
   textSize: 100,
@@ -57,6 +61,43 @@ const defaultSettings: AccessibilitySettings = {
   focusHighlight: false,
   isSpeaking: false,
 };
+
+function safeGetLocalStorage(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetLocalStorage(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    /* private mode / αποκλεισμός — το widget λειτουργεί χωρίς persistence */
+  }
+}
+
+function safeRemoveLocalStorage(key: string): void {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+}
+
+function loadStoredSettings(): AccessibilitySettings {
+  const raw =
+    safeGetLocalStorage(LS_KEY) ?? safeGetLocalStorage(LS_KEY_LEGACY);
+  if (raw) {
+    try {
+      return { ...defaultSettings, ...JSON.parse(raw), isSpeaking: false };
+    } catch {
+      return defaultSettings;
+    }
+  }
+  return defaultSettings;
+}
 
 function countActive(s: AccessibilitySettings): number {
   let count = 0;
@@ -84,27 +125,21 @@ function countActive(s: AccessibilitySettings): number {
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
 
 export function AccessibilityProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<AccessibilitySettings>(() => {
-    const stored = localStorage.getItem('accessibility-settings');
-    if (stored) {
-      try {
-        return { ...defaultSettings, ...JSON.parse(stored), isSpeaking: false };
-      } catch {
-        return defaultSettings;
-      }
-    }
-    return defaultSettings;
-  });
+  const [settings, setSettings] = useState<AccessibilitySettings>(() => loadStoredSettings());
 
   useEffect(() => {
     const { isSpeaking: _, ...persistable } = settings;
-    localStorage.setItem('accessibility-settings', JSON.stringify(persistable));
+    safeSetLocalStorage(LS_KEY, JSON.stringify(persistable));
+    safeRemoveLocalStorage(LS_KEY_LEGACY);
     applySettings(settings);
+    /** Μόνο όταν υπάρχει τουλάχιστον μία ενεργή ρύθμιση· αλλιώς κανένα [data-a11y="on"] rule δεν εφαρμόζεται στη σελίδα. */
+    const active = countActive(settings) > 0;
+    if (active) {
+      document.documentElement.setAttribute('data-a11y', 'on');
+    } else {
+      document.documentElement.removeAttribute('data-a11y');
+    }
   }, [settings]);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-a11y', 'on');
-  }, []);
 
   // Γλώσσα widget: ΜΟΝΟ το UI του widget (όχι το κείμενο της σελίδας του πελάτη).
   // Το document.documentElement.lang αφήνεται όπως το έχει η σελίδα.
@@ -118,7 +153,8 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
 
   const resetAll = () => {
     setSettings(defaultSettings);
-    localStorage.removeItem('accessibility-settings');
+    safeRemoveLocalStorage(LS_KEY);
+    safeRemoveLocalStorage(LS_KEY_LEGACY);
   };
 
   return (
@@ -144,7 +180,12 @@ function setAttr(el: HTMLElement, attr: string, on: boolean) {
 function applySettings(s: AccessibilitySettings) {
   const root = document.documentElement;
 
-  root.style.fontSize = `${s.textSize}%`;
+  /** Όταν 100%, αφαιρούμε το inline ώστε να μην αλλάζουμε το font-size του host <html>. */
+  if (s.textSize === 100) {
+    root.style.removeProperty('font-size');
+  } else {
+    root.style.fontSize = `${s.textSize}%`;
+  }
 
   setAttr(root, 'data-high-contrast', s.highContrast);
   setAttr(root, 'data-invert-colors', s.invertColors);

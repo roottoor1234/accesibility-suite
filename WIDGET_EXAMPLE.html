@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Παράδειγμα Ενσωμάτωσης Widget Προσβασιμότητας</title>
 
-  <!-- Φόρτωση CSS του widget -->
-  <link rel="stylesheet" href="./dist-widget/a11y-widget.css">
+  <!-- Το CSS φορτώνει αυτόματα από το script (ίδιο path με a11y-widget.js). Για ταχύτητα μπορείτε να βάλετε και: <link rel="stylesheet" href="./dist-widget/a11y-widget.css"> -->
 
   <style>
     * {
@@ -233,24 +232,40 @@
 
     <section>
       <h2>🚀 Οδηγός Ενσωμάτωσης</h2>
-      <p>Για να χρησιμοποιήσετε το widget στη δική σας ιστοσελίδα, απλά προσθέστε αυτά τα 2 αρχεία:</p>
+      <p>Για να χρησιμοποιήσετε το widget στη δική σας ιστοσελίδα, προσθέστε ένα script με <strong>data-account</strong> (όπως Userway). Το Account ID το δίνει η πλατφόρμα συνδρομής σας.</p>
 
-      <h3>Βήμα 1: Προσθέστε το CSS</h3>
-      <pre><code>&lt;!-- Φόρτωση CSS του widget --&gt;
-&lt;link rel="stylesheet" href="https://your-cdn.com/a11y-widget.css"&gt;</code></pre>
-
-      <h3>Βήμα 2: Προσθέστε το JavaScript</h3>
-      <pre><code>&lt;!-- Φόρτωση JS του widget --&gt;
-&lt;script src="https://your-cdn.com/a11y-widget.js"&gt;&lt;/script&gt;</code></pre>
-
-      <h3>Βήμα 3: Αρχικοποίηση (Προαιρετικό)</h3>
-      <p>Το widget αρχικοποιείται αυτόματα, αλλά μπορείτε να το ελέγξετε χειροκίνητα:</p>
+      <h3>Βήμα 1: Προσθέστε το script με το Account ID σας</h3>
       <pre><code>&lt;script&gt;
-  // Αρχικοποίηση με προσαρμοσμένη θέση
-  window.initA11yWidget({
-    position: 'bottom-right' // ή 'bottom-left', 'top-right', 'top-left'
-  });
+(function(d){
+  var s = d.createElement("script");
+  s.setAttribute("data-account", "YOUR_ACCOUNT_ID");
+  s.setAttribute("src", "https://your-cdn.com/a11y-widget.js");
+  (d.body || d.head).appendChild(s);
+})(document);
 &lt;/script&gt;</code></pre>
+
+      <p>Το widget φορτώνει αυτόματα το CSS από το ίδιο CDN path. Το <code>YOUR_ACCOUNT_ID</code> αντικαθίσταται από την πλατφόρμα όταν ο χρήστης αγοράζει συνδρομή.</p>
+
+      <h3>Βήμα 2: Domain restriction (από την πλατφόρμα σας)</h3>
+      <p>Για να ασφαλίσετε το widget ανά domain, ορίστε πριν το script ένα endpoint επικύρωσης. Το widget θα καλεί <code>GET validationUrl?accountId=...&amp;domain=...</code> και θα εμφανίζεται μόνο αν η απάντηση είναι <code>{"allowed": true}</code>.</p>
+      <pre><code>&lt;script&gt;
+window.A11Y_WIDGET_CONFIG = { validationUrl: "https://your-platform.com/api/widget/validate" };
+&lt;/script&gt;
+&lt;script&gt;
+(function(d){
+  var s = d.createElement("script");
+  s.setAttribute("data-account", "YOUR_ACCOUNT_ID");
+  s.setAttribute("src", "https://your-cdn.com/a11y-widget.js");
+  (d.body || d.head).appendChild(s);
+})(document);
+&lt;/script&gt;</code></pre>
+
+      <h3>Βήμα 3: Χειροκίνητη αρχικοποίηση (προαιρετικό)</h3>
+      <p>Μπορείτε να καλέσετε <code>initA11yWidget</code> με θέση ή accountId:</p>
+      <pre><code>window.initA11yWidget({
+  position: 'bottom-right',  // ή 'bottom-left', 'top-right', 'top-left'
+  accountId: 'YOUR_ACCOUNT_ID'
+});</code></pre>
 
       <div class="highlight-box">
         <strong>💾 Αυτόματη Αποθήκευση:</strong> Όλες οι ρυθμίσεις αποθηκεύονται αυτόματα στο localStorage και παραμένουν ενεργές σε όλες τις επισκέψεις!
@@ -300,14 +315,15 @@
     <p style="margin-top: 0.5rem; font-size: 0.9rem;">Δημιουργήθηκε με React, TypeScript & Tailwind CSS</p>
   </footer>
 
-  <!-- Φόρτωση JS του widget -->
-  <script src="./dist-widget/a11y-widget.js"></script>
-
-  <!-- Το widget αρχικοποιείται αυτόματα! -->
-  <!-- Προαιρετικά, μπορείτε να το ελέγξετε χειροκίνητα:
+  <!-- Ενσωμάτωση με Account ID (στυλ Userway) - για πλατφόρμα συνδρομής -->
   <script>
-    window.initA11yWidget({ position: 'bottom-right' });
+  (function(d){
+    var s = d.createElement("script");
+    s.setAttribute("data-account", "YOUR_ACCOUNT_ID");
+    s.setAttribute("src", "./dist-widget/a11y-widget.js");
+    (d.body || d.head).appendChild(s);
+  })(document);
   </script>
-  -->
+  <!-- Το widget αρχικοποιείται αυτόματα με το accountId. Για domain restriction, στη πλατφόρμα σας ορίστε A11Y_WIDGET_CONFIG.validationUrl. -->
 </body>
 </html>

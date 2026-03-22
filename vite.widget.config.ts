@@ -9,6 +9,8 @@ export default defineConfig({
   define: {
     'process.env': '{}',
     'process.env.NODE_ENV': '"production"',
+    /** false = κανονικό build (επιτρέπει validation API). true μόνο στο vite.widget.personal.config.ts */
+    __WIDGET_PERSONAL__: JSON.stringify(false),
   },
   build: {
     lib: {

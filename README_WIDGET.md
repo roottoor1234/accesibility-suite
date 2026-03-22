@@ -103,10 +103,26 @@ npm run build:widget
   </main>
 
   <!-- Widget JS (φορτώνεται στο τέλος για καλύτερη απόδοση) -->
-  <script src="https://your-cdn.com/a11y-widget.css"></script>
+  <script src="https://your-cdn.com/a11y-widget.js"></script>
 </body>
 </html>
 ```
+
+### Embed: κίνδυνοι & CSP
+
+Δες **[WIDGET_EMBED_NOTES.md](WIDGET_EMBED_NOTES.md)** (body wrap, CSP, mixed content, localStorage, κλπ.).
+
+### CSS isolation (embed σε ξένες σελίδες)
+
+Το standalone widget: **δεν** ενεργοποιεί `data-a11y` στο `<html>` μέχρι να αλλάξει ο χρήστης τουλάχιστον μία ρύθμιση· το Tailwind **Preflight** είναι απενεργοποιημένο στο widget bundle· τα εφέ εφαρμόζονται κυρίως μέσα στο `.a11y-content-wrap`. Έτσι δεν «σπάνε» radios/checkboxes της host σελίδας χωρίς ενεργοποίηση επιλογών.
+
+### Προσωπική χρήση (χωρίς API / checks)
+
+Δες **[PERSONAL_USE.md](PERSONAL_USE.md)**: είτε χωρίς `A11Y_WIDGET_CONFIG` στο κανονικό build, είτε `npm run build:widget:personal` για bundle που αγνοεί πλήρως το validation API.
+
+### Πλατφόρμα συνδρομής & domain restriction
+
+Αν θες να πουλάς το widget μέσω πλατφόρμας (account ID + domain restriction), δες τον **[αναλυτικό οδηγό πλατφόρμας](WIDGET_PLATFORM_GUIDE.md)** (`WIDGET_PLATFORM_GUIDE.md`): ΒΔ, API endpoint, CORS, snippet για πελάτες.
 
 ## 🔧 Troubleshooting
 

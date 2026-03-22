@@ -36,11 +36,12 @@ export type WidgetPosition =
   | "top-right"
   | "top-left";
 
+/** Σταθερά px (όχι rem) ώστε embed σε host με μεγάλο html { font-size } να μην μεγαλώνει το widget. */
 const positionClasses: Record<WidgetPosition, string> = {
-  "bottom-right": "bottom-6 right-6",
-  "bottom-left": "bottom-6 left-6",
-  "top-right": "top-6 right-6",
-  "top-left": "top-6 left-6",
+  "bottom-right": "bottom-[24px] right-[24px]",
+  "bottom-left": "bottom-[24px] left-[24px]",
+  "top-right": "top-[24px] right-[24px]",
+  "top-left": "top-[24px] left-[24px]",
 };
 
 const LANG_OPTIONS: { value: "el" | "en" | "de"; flagCode: string; name: string }[] = [
@@ -207,13 +208,14 @@ export function AccessibilityWidget({
       <div
         className={`accessibility-widget fixed ${positionClasses[position]} z-[9999]`}
         lang={settings.language}
+        data-a11y-widget-root=""
       >
         {/* ═══ Trigger Button ═══ */}
         <button
           ref={buttonRef}
           onClick={() => setIsOpen(!isOpen)}
           className={`
-            relative w-16 h-16 rounded-2xl text-white shadow-xl
+            relative w-[64px] h-[64px] min-w-[64px] min-h-[64px] rounded-[16px] text-white shadow-xl
             focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 focus-visible:ring-offset-2
             transition-all duration-300 flex items-center justify-center group
             bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700
@@ -224,9 +226,9 @@ export function AccessibilityWidget({
           aria-label={isOpen ? L("closeMenu") : L("openMenu")}
           aria-expanded={isOpen}
         >
-          <Accessibility className="w-7 h-7 group-hover:scale-110 transition-transform drop-shadow-md" />
+          <Accessibility className="w-[28px] h-[28px] group-hover:scale-110 transition-transform drop-shadow-md shrink-0" />
           {activeCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center shadow-lg ring-2 ring-white">
+            <span className="absolute -top-1.5 -right-1.5 min-w-[24px] min-h-[24px] w-[24px] h-[24px] rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center shadow-lg ring-2 ring-white">
               {activeCount}
             </span>
           )}

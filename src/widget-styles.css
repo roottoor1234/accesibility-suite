@@ -1,3 +1,4 @@
+@config "../tailwind.widget.config.js";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,12 +24,12 @@
     --cursor-size-scale: 1;
   }
 
-  /* ─── Focus (WCAG 2.4.7 / 2.4.13) ─── */
-  *:focus-visible {
+  /* ─── Focus μόνο μέσα στο widget (όχι σε όλη τη host σελίδα) ─── */
+  .accessibility-widget *:focus-visible {
     outline: 3px solid #2563eb;
     outline-offset: 2px;
   }
-  *:focus:not(:focus-visible) {
+  .accessibility-widget *:focus:not(:focus-visible) {
     outline: none;
   }
 
@@ -37,22 +38,26 @@
     pointer-events: auto !important;
   }
 
-  /* ─── Text Spacing (WCAG 1.4.12) ─── */
-  [data-a11y="on"] * {
+  /* ─── Text Spacing (WCAG 1.4.12) — μόνο περιεχόμενο σελίδας, όχι host UI έξω από wrap ─── */
+  [data-a11y="on"] .a11y-content-wrap * {
     line-height: calc(1.5 * var(--line-height-scale));
     letter-spacing: var(--letter-spacing-scale);
     word-spacing: var(--word-spacing-scale);
   }
 
-  [data-a11y="on"] { cursor: auto; }
-  [data-a11y="on"] * { cursor: inherit; }
+  [data-a11y="on"] .a11y-content-wrap {
+    cursor: auto;
+  }
+  [data-a11y="on"] .a11y-content-wrap * {
+    cursor: inherit;
+  }
 
   /* ─── High Contrast ─── */
   [data-a11y="on"][data-high-contrast="true"] {
     background-color: #000 !important;
     color: #fff !important;
   }
-  [data-a11y="on"][data-high-contrast="true"] * {
+  [data-a11y="on"][data-high-contrast="true"] .a11y-content-wrap * {
     background-color: #000 !important;
     color: #fff !important;
     border-color: #fff !important;
@@ -100,23 +105,17 @@
   [data-a11y="on"][data-color-overlay="green"] .a11y-content-wrap::before { background: rgba(100, 255, 130, 0.1); }
   [data-a11y="on"][data-color-overlay="pink"] .a11y-content-wrap::before { background: rgba(255, 130, 180, 0.1); }
 
-  /* ─── Pause Animations ─── */
-  [data-a11y="on"][data-pause-animations="true"],
-  [data-a11y="on"][data-pause-animations="true"] * {
+  /* ─── Pause Animations — μόνο στο wrap περιεχομένου ─── */
+  [data-a11y="on"][data-pause-animations="true"] .a11y-content-wrap,
+  [data-a11y="on"][data-pause-animations="true"] .a11y-content-wrap * {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.001ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.001ms !important;
-    }
-  }
+  /* Δεν εφαρμόζουμε prefers-reduced-motion σε όλη τη σελίδα από το embed (μόνο όταν ο χρήστης ενεργοποιήσει Pause). */
 
   /* ─── Highlight Links ─── */
-  [data-a11y="on"][data-highlight-links="true"] a {
+  [data-a11y="on"][data-highlight-links="true"] .a11y-content-wrap a {
     background-color: #fef08a !important;
     color: #000 !important;
     text-decoration: underline !important;
@@ -132,12 +131,12 @@
   }
 
   /* ─── Highlight Headings ─── */
-  [data-a11y="on"][data-highlight-headings="true"] h1,
-  [data-a11y="on"][data-highlight-headings="true"] h2,
-  [data-a11y="on"][data-highlight-headings="true"] h3,
-  [data-a11y="on"][data-highlight-headings="true"] h4,
-  [data-a11y="on"][data-highlight-headings="true"] h5,
-  [data-a11y="on"][data-highlight-headings="true"] h6 {
+  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h1,
+  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h2,
+  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h3,
+  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h4,
+  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h5,
+  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h6 {
     border-bottom: 3px solid #3b82f6 !important;
     padding-bottom: 4px !important;
     background: linear-gradient(to right, rgba(59, 130, 246, 0.08), transparent) !important;
@@ -154,17 +153,17 @@
   }
 
   /* ─── Dyslexic Font ─── */
-  [data-a11y="on"][data-dyslexic-font="true"],
-  [data-a11y="on"][data-dyslexic-font="true"] * {
+  [data-a11y="on"][data-dyslexic-font="true"] .a11y-content-wrap,
+  [data-a11y="on"][data-dyslexic-font="true"] .a11y-content-wrap * {
     font-family: 'Comic Sans MS', 'OpenDyslexic', Arial, Helvetica, sans-serif !important;
     font-weight: 500 !important;
   }
 
   /* ─── Hide Images ─── */
-  [data-a11y="on"][data-hide-images="true"] img,
-  [data-a11y="on"][data-hide-images="true"] svg:not(.a11y-icon),
-  [data-a11y="on"][data-hide-images="true"] video,
-  [data-a11y="on"][data-hide-images="true"] picture {
+  [data-a11y="on"][data-hide-images="true"] .a11y-content-wrap img,
+  [data-a11y="on"][data-hide-images="true"] .a11y-content-wrap svg:not(.a11y-icon),
+  [data-a11y="on"][data-hide-images="true"] .a11y-content-wrap video,
+  [data-a11y="on"][data-hide-images="true"] .a11y-content-wrap picture {
     opacity: 0.05 !important;
     pointer-events: none !important;
   }
@@ -175,35 +174,35 @@
   }
 
   /* ─── Text Align ─── */
-  [data-a11y="on"][data-text-align="left"] * { text-align: left !important; }
-  [data-a11y="on"][data-text-align="center"] * { text-align: center !important; }
-  [data-a11y="on"][data-text-align="right"] * { text-align: right !important; }
+  [data-a11y="on"][data-text-align="left"] .a11y-content-wrap * { text-align: left !important; }
+  [data-a11y="on"][data-text-align="center"] .a11y-content-wrap * { text-align: center !important; }
+  [data-a11y="on"][data-text-align="right"] .a11y-content-wrap * { text-align: right !important; }
   [data-a11y="on"][data-text-align] .accessibility-widget * { text-align: initial !important; }
 
-  /* ─── Focus Highlight Enhanced ─── */
-  [data-a11y="on"][data-focus-highlight="true"] *:focus-visible {
+  /* ─── Focus Highlight Enhanced — μόνο περιεχόμενο σελίδας ─── */
+  [data-a11y="on"][data-focus-highlight="true"] .a11y-content-wrap *:focus-visible {
     outline: 4px solid #ef4444 !important;
     outline-offset: 4px !important;
     box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.3) !important;
   }
 
-  /* ─── Target Size (44px AAA) ─── */
-  [data-a11y="on"] button,
-  [data-a11y="on"] a,
-  [data-a11y="on"] [role="button"],
-  [data-a11y="on"] input[type="checkbox"],
-  [data-a11y="on"] input[type="radio"] {
+  /* ─── Target Size (44px AAA) — μόνο μέσα στο περιεχόμενο σελίδας ─── */
+  [data-a11y="on"] .a11y-content-wrap button,
+  [data-a11y="on"] .a11y-content-wrap a,
+  [data-a11y="on"] .a11y-content-wrap [role="button"],
+  [data-a11y="on"] .a11y-content-wrap input[type="checkbox"],
+  [data-a11y="on"] .a11y-content-wrap input[type="radio"] {
     min-width: 44px !important;
     min-height: 44px !important;
   }
 
-  /* ─── Cursor Size ─── */
-  [data-a11y="on"][data-cursor-size="large"],
-  [data-a11y="on"][data-cursor-size="large"] * {
+  /* ─── Cursor Size — πάνω στο wrap + περιεχόμενο (όχι στο #a11y-widget-container) ─── */
+  [data-a11y="on"][data-cursor-size="large"] .a11y-content-wrap,
+  [data-a11y="on"][data-cursor-size="large"] .a11y-content-wrap * {
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><path d="M4 4 L4 42 L18 30 L26 44 L32 40 L24 27 L40 27 Z" fill="black" stroke="white" stroke-width="2"/></svg>') 0 0, auto !important;
   }
-  [data-a11y="on"][data-cursor-size="xlarge"],
-  [data-a11y="on"][data-cursor-size="xlarge"] * {
+  [data-a11y="on"][data-cursor-size="xlarge"] .a11y-content-wrap,
+  [data-a11y="on"][data-cursor-size="xlarge"] .a11y-content-wrap * {
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><path d="M5 5 L5 56 L24 40 L34 58 L42 54 L32 36 L52 36 Z" fill="black" stroke="white" stroke-width="3"/></svg>') 0 0, auto !important;
   }
 
@@ -235,12 +234,26 @@
     transition: top 0.05s linear, bottom 0.05s linear, height 0.05s linear;
   }
 
-  /* ─── Trigger pulse ─── */
-  @keyframes a11y-pulse {
+  /* ─── Trigger pulse (μοναδικό όνομα + !important ώστε host CSS να μην επιταχύνει το glow) ─── */
+  @keyframes a11y-widget-trigger-glow {
     0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
     50% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
   }
   .a11y-trigger-pulse {
-    animation: a11y-pulse 2.5s ease-in-out infinite;
+    animation-name: a11y-widget-trigger-glow !important;
+    animation-duration: 2.5s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-play-state: running !important;
   }
+  @media (prefers-reduced-motion: reduce) {
+    .a11y-trigger-pulse {
+      animation: none !important;
+    }
+  }
+}
+
+/* Root embed: stacking context ώστε να μειώνεται επίδραση από global host CSS */
+#a11y-widget-container {
+  isolation: isolate;
 }
