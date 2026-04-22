@@ -1,17 +1,30 @@
 {
-  "name": "vite-react-typescript-starter",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@bytepair/web-widget",
+  "private": false,
+  "version": "1.0.0",
   "type": "module",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build:widget": "vite build --config vite.widget.config.ts",
     "build:widget:personal": "vite build --config vite.widget.personal.config.ts",
+    "build:widget:npm": "vite build --config vite.widget.npm.config.ts",
     "build:all": "npm run build && npm run build:widget",
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "main": "./lib/index.min.js",
+  "style": "./lib/index.min.css",
+  "exports": {
+    ".": {
+      "default": "./lib/index.min.js"
+    },
+    "./index.min.css": "./lib/index.min.css"
   },
   "dependencies": {
     "lucide-react": "^0.344.0",

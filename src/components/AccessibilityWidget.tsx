@@ -68,6 +68,8 @@ export function AccessibilityWidget({
 }: { position?: WidgetPosition } = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [panelMounted, setPanelMounted] = useState(false);
+  const [panelVisible, setPanelVisible] = useState(false);
   const { settings, updateSetting, resetAll, activeCount } =
     useAccessibility();
   const { speak, stop, isSpeaking } = useTextToSpeech();
@@ -110,6 +112,23 @@ export function AccessibilityWidget({
 
   useEffect(() => {
     if (isOpen) document.getElementById("a11y-close-btn")?.focus();
+  }, [isOpen]);
+
+  // Mount panel for animation; unmount after close transition ends.
+  useEffect(() => {
+    if (isOpen) {
+      setPanelMounted(true);
+      // Start from "closed" state then open on next frame,
+      // otherwise mount happens already open and the slide-in won't animate.
+      setPanelVisible(false);
+      // Double rAF ensures at least one paint in the closed state (React 18 batching can skip it otherwise).
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setPanelVisible(true));
+      });
+    } else {
+      // Trigger slide-out + fade-out while staying mounted.
+      setPanelVisible(false);
+    }
   }, [isOpen]);
 
   // Language dropdown: keyboard (WCAG 2.1.1) and focus + aria-activedescendant
@@ -235,20 +254,39 @@ export function AccessibilityWidget({
         </button>
 
         {/* ═══ Panel ═══ */}
-        {isOpen && (
+        {panelMounted && (
           <>
             <div
-              className="fixed inset-0 bg-black/25 z-[9998]"
+              className={[
+                "fixed inset-0 z-[9998] transition-opacity duration-300 ease-out",
+                "motion-reduce:transition-none",
+                panelVisible
+                  ? "opacity-100 bg-black/25"
+                  : "opacity-0 bg-black/0 pointer-events-none",
+              ].join(" ")}
               onClick={handleClose}
               aria-hidden="true"
+              onTransitionEnd={() => {
+                // When overlay finishes fading out, unmount panel
+                if (!panelVisible && !isOpen) setPanelMounted(false);
+              }}
             />
 
             <div
               ref={panelRef}
-              className="fixed top-0 left-0 h-full w-full max-w-[420px] bg-gray-50 shadow-2xl overflow-y-auto z-[9999] transition-transform duration-300 ease-out"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="a11y-panel-title"
+              className={[
+                "fixed top-0 left-0 h-full w-full max-w-[420px] bg-gray-50 shadow-2xl overflow-y-auto z-[9999]",
+                "transform transition-transform duration-300 ease-out will-change-transform",
+                "motion-reduce:transition-none motion-reduce:transform-none",
+                panelVisible
+                  ? "translate-x-0"
+                  : "-translate-x-full pointer-events-none",
+              ].join(" ")}
+              role={panelVisible ? "dialog" : undefined}
+              aria-modal={panelVisible ? "true" : undefined}
+              aria-labelledby={panelVisible ? "a11y-panel-title" : undefined}
+              aria-hidden={panelVisible ? undefined : true}
+              tabIndex={panelVisible ? undefined : -1}
             >
               {/* ── Header ── */}
               <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 px-5 py-4 flex items-center justify-between shadow-lg">
