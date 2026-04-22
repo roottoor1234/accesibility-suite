@@ -16,12 +16,14 @@ export default mergeConfig(
       emptyOutDir: true,
       lib: {
         entry: 'src/widget-standalone.tsx',
-        name: 'SmartRepWebWidget',
+        name: 'BytepairWebWidget',
         fileName: () => 'index.min.js',
         formats: ['iife'],
       },
       rollupOptions: {
         output: {
+          banner:
+            '/*! @bytepair/wcag-widget | (c) 2026 Bytepair | MIT License */',
           assetFileNames: (assetInfo) => {
             if (assetInfo.name?.endsWith('.css')) return 'index.min.css';
             return assetInfo.name || 'asset';

@@ -22,6 +22,8 @@ export default defineConfig({
     outDir: 'dist-widget',
     rollupOptions: {
       output: {
+        banner:
+          '/*! @bytepair/wcag-widget | (c) 2026 Bytepair | MIT License */',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name?.endsWith('.css')) {
             return 'a11y-widget.css';

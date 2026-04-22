@@ -1,4 +1,4 @@
-(function(){"use strict";var Yo={exports:{}},ar={},Xo={exports:{}},j={};/**
+/*! @bytepair/web-widget | (c) 2026 Bytepair | MIT License */(function(){"use strict";var Yo={exports:{}},ar={},Xo={exports:{}},j={};/**
  * @license React
  * react.production.min.js
  *

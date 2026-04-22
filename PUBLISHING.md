@@ -40,11 +40,12 @@ npm publish --access public
 
 Μετά το publish, μπορείς να φορτώσεις:
 
-- JS: `https://cdn.jsdelivr.net/npm/@bytepair/web-widget@1.0.31/lib/index.min.js`
-- CSS: `https://cdn.jsdelivr.net/npm/@bytepair/web-widget@1.0.31/lib/index.min.css`
+- JS: `https://cdn.jsdelivr.net/npm/@bytepair/wcag-widget@1.0.31/lib/index.min.js`
+- CSS: `https://cdn.jsdelivr.net/npm/@bytepair/wcag-widget@1.0.31/lib/index.min.css`
 
 Για “latest” χωρίς pin:
 
-- JS: `https://cdn.jsdelivr.net/npm/@bytepair/web-widget/lib/index.min.js`
-- CSS: `https://cdn.jsdelivr.net/npm/@bytepair/web-widget/lib/index.min.css`
+- JS: `https://cdn.jsdelivr.net/npm/@bytepair/wcag-widget/lib/index.min.js`
+- CSS: `https://cdn.jsdelivr.net/npm/@bytepair/wcag-widget/lib/index.min.css`
+
 
