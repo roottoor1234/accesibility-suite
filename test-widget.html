@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="el">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bytepair WCAG Widget - CSS Conflict Test</title>
+
+    <!-- Bytepair WCAG Widget (LOCAL lib build) -->
+    <!-- 1) Τρέξε: npm run build:widget:npm  (παράγει lib/index.min.js + lib/index.min.css) -->
+    <!-- 2) Άνοιξε τη σελίδα από local server (π.χ. python -m http.server 8080 στο project root) -->
+    <!-- Σημείωση: ΜΗΝ βάζεις <link> για το widget CSS εδώ. Το JS φορτώνει το CSS μέσα στο Shadow DOM. -->
+    <script defer src="./lib/index.min.js"></script>
+
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        padding: 24px;
+        line-height: 1.5;
+        max-width: 980px;
+        margin: 0 auto;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+      }
+      .card {
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(6px);
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+          monospace;
+        font-size: 0.95em;
+      }
+      .hint {
+        color: rgba(0, 0, 0, 0.7);
+        font-size: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #0b1020;
+          color: #e7e9ee;
+        }
+        .card {
+          border-color: rgba(255, 255, 255, 0.15);
+          background: rgba(20, 26, 44, 0.6);
+        }
+        .hint {
+          color: rgba(231, 233, 238, 0.75);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>WCAG Widget – CSS Conflict Test</h1>
+    <p class="hint">
+      Άνοιξε DevTools (F12) → <strong>Console</strong> και <strong>Network</strong>. Βεβαιώσου ότι φορτώνουν 200 τα
+      <code>index.min.css</code> και <code>index.min.js</code>. Μετά, χωρίς να πατήσεις τίποτα στο widget, έλεγξε αν
+      αλλάζουν τα controls παρακάτω.
+    </p>
+
+    <div class="grid" style="margin-top: 16px">
+      <section class="card">
+        <h2>Checkbox / Radio</h2>
+        <div class="row" style="margin-top: 10px">
+          <label><input type="checkbox" /> Checkbox A</label>
+          <label><input type="checkbox" /> Checkbox B</label>
+        </div>
+        <div class="row" style="margin-top: 10px">
+          <label><input type="radio" name="r1" /> Radio 1</label>
+          <label><input type="radio" name="r1" /> Radio 2</label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Buttons / Links</h2>
+        <div class="row" style="margin-top: 10px">
+          <button type="button">Button</button>
+          <a href="#" onclick="return false">Link</a>
+        </div>
+        <p class="hint" style="margin-top: 10px">
+          Αν δεις αλλαγές σε outline/focus χωρίς να ενεργοποιήσεις feature, είναι πιθανό conflict.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Accordion</h2>
+        <details style="margin-top: 10px">
+          <summary>Άνοιγμα</summary>
+          <p style="margin-top: 10px">
+            Περιεχόμενο. Δοκίμασε να το ανοίξεις/κλείσεις και δες αν αλλάζει styling “μόνο του”.
+          </p>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2>Form fields</h2>
+        <div style="display: grid; gap: 10px; margin-top: 10px">
+          <label>
+            Input:
+            <input type="text" placeholder="Type here" />
+          </label>
+          <label>
+            Select:
+            <select>
+              <option>Option 1</option>
+              <option>Option 2</option>
+            </select>
+          </label>
+          <label>
+            Textarea:
+            <textarea rows="3" placeholder="..."></textarea>
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <hr style="margin: 24px 0" />
+
+    <p class="hint">
+      Tip: Για να δεις αν rule έρχεται από το widget, κάνε inspect ένα element → tab <strong>Styles</strong> και ψάξε
+      για κανόνες που δείχνουν σε <code>index.min.css</code>.
+    </p>
+  </body>
+</html>
+

@@ -180,12 +180,11 @@ function setAttr(el: HTMLElement, attr: string, on: boolean) {
 function applySettings(s: AccessibilitySettings) {
   const root = document.documentElement;
 
-  /** Όταν 100%, αφαιρούμε το inline ώστε να μην αλλάζουμε το font-size του host <html>. */
-  if (s.textSize === 100) {
-    root.style.removeProperty('font-size');
-  } else {
-    root.style.fontSize = `${s.textSize}%`;
-  }
+  /**
+   * IMPORTANT: Δεν αλλάζουμε το font-size του host <html>.
+   * Το scaling κειμένου γίνεται μόνο στο `.a11y-content-wrap` μέσω CSS (βλ. widget-standalone ensureGlobalEffectsStyle).
+   */
+  root.style.setProperty('--a11y-text-size', `${s.textSize}%`);
 
   setAttr(root, 'data-high-contrast', s.highContrast);
   setAttr(root, 'data-invert-colors', s.invertColors);

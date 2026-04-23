@@ -1,7 +1,7 @@
 {
   "name": "@bytepair/wcag-widget",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.0.5",
   "type": "module",
   "license": "MIT",
   "author": "Bytepair (Marios Kaldellis)",

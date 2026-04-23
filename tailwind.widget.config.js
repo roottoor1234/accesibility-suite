@@ -9,6 +9,11 @@ export default {
   important: '#a11y-widget-container',
   corePlugins: {
     preflight: false,
+    /**
+     * Το `.container` βγαίνει σαν global rule σε κάποια builds και μπορεί να συγκρουστεί
+     * με frameworks που χρησιμοποιούν `.container` στο host site.
+     */
+    container: false,
   },
   theme: {
     extend: {},
