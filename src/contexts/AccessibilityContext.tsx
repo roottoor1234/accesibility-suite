@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { buildA11yCursor } from '../utils/cursorSize';
 
 export type AppLocale = 'el' | 'en' | 'de';
 
@@ -132,13 +133,6 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
     safeSetLocalStorage(LS_KEY, JSON.stringify(persistable));
     safeRemoveLocalStorage(LS_KEY_LEGACY);
     applySettings(settings);
-    /** Μόνο όταν υπάρχει τουλάχιστον μία ενεργή ρύθμιση· αλλιώς κανένα [data-a11y="on"] rule δεν εφαρμόζεται στη σελίδα. */
-    const active = countActive(settings) > 0;
-    if (active) {
-      document.documentElement.setAttribute('data-a11y', 'on');
-    } else {
-      document.documentElement.removeAttribute('data-a11y');
-    }
   }, [settings]);
 
   // Γλώσσα widget: ΜΟΝΟ το UI του widget (όχι το κείμενο της σελίδας του πελάτη).
@@ -177,40 +171,80 @@ function setAttr(el: HTMLElement, attr: string, on: boolean) {
   else el.removeAttribute(attr);
 }
 
-function applySettings(s: AccessibilitySettings) {
+/** Καθαρίζει legacy attributes/CSS vars από <html> (παλιότερες εκδόσεις). */
+function clearLegacyPageAttrs(): void {
   const root = document.documentElement;
+  const legacyAttrs = [
+    'data-a11y',
+    'data-high-contrast',
+    'data-invert-colors',
+    'data-pause-animations',
+    'data-highlight-links',
+    'data-highlight-headings',
+    'data-reading-guide',
+    'data-reading-mask',
+    'data-dyslexic-font',
+    'data-hide-images',
+    'data-focus-highlight',
+    'data-saturation',
+    'data-color-overlay',
+    'data-text-align',
+    'data-cursor-size',
+  ];
+  for (const attr of legacyAttrs) root.removeAttribute(attr);
+  root.style.removeProperty('--a11y-text-size');
+  root.style.removeProperty('--line-height-scale');
+  root.style.removeProperty('--letter-spacing-scale');
+  root.style.removeProperty('--word-spacing-scale');
+}
+
+function getPageTarget(): HTMLElement {
+  return (document.querySelector('.a11y-content-wrap') as HTMLElement | null) ?? document.documentElement;
+}
+
+function applySettings(s: AccessibilitySettings) {
+  clearLegacyPageAttrs();
+  const target = getPageTarget();
 
   /**
-   * IMPORTANT: Δεν αλλάζουμε το font-size του host <html>.
-   * Το scaling κειμένου γίνεται μόνο στο `.a11y-content-wrap` μέσω CSS (βλ. widget-standalone ensureGlobalEffectsStyle).
+   * Όλες οι ρυθμίσεις σελίδας μόνο στο `.a11y-content-wrap` — όχι στο <html>.
+   * Έτσι δεν διαρρέουν CSS variables / inherited styles στο widget (Shadow DOM host).
    */
-  root.style.setProperty('--a11y-text-size', `${s.textSize}%`);
+  target.style.setProperty('--a11y-text-size', `${s.textSize}%`);
+  target.style.setProperty('--line-height-scale', `${s.lineHeight / 100}`);
+  target.style.setProperty('--letter-spacing-scale', `${(s.letterSpacing - 100) / 100}em`);
+  target.style.setProperty('--word-spacing-scale', `${(s.wordSpacing - 100) / 100}em`);
 
-  setAttr(root, 'data-high-contrast', s.highContrast);
-  setAttr(root, 'data-invert-colors', s.invertColors);
-  setAttr(root, 'data-pause-animations', s.pauseAnimations);
-  setAttr(root, 'data-highlight-links', s.highlightLinks);
-  setAttr(root, 'data-highlight-headings', s.highlightHeadings);
-  setAttr(root, 'data-reading-guide', s.readingGuide);
-  setAttr(root, 'data-reading-mask', s.readingMask);
-  setAttr(root, 'data-dyslexic-font', s.dyslexicFont);
-  setAttr(root, 'data-hide-images', s.hideImages);
-  setAttr(root, 'data-focus-highlight', s.focusHighlight);
+  setAttr(target, 'data-high-contrast', s.highContrast);
+  setAttr(target, 'data-invert-colors', s.invertColors);
+  setAttr(target, 'data-pause-animations', s.pauseAnimations);
+  setAttr(target, 'data-highlight-links', s.highlightLinks);
+  setAttr(target, 'data-highlight-headings', s.highlightHeadings);
+  setAttr(target, 'data-reading-guide', s.readingGuide);
+  setAttr(target, 'data-reading-mask', s.readingMask);
+  setAttr(target, 'data-dyslexic-font', s.dyslexicFont);
+  setAttr(target, 'data-hide-images', s.hideImages);
+  setAttr(target, 'data-focus-highlight', s.focusHighlight);
 
-  if (s.saturation !== 'normal') root.setAttribute('data-saturation', s.saturation);
-  else root.removeAttribute('data-saturation');
+  if (s.saturation !== 'normal') target.setAttribute('data-saturation', s.saturation);
+  else target.removeAttribute('data-saturation');
 
-  if (s.colorOverlay !== 'none') root.setAttribute('data-color-overlay', s.colorOverlay);
-  else root.removeAttribute('data-color-overlay');
+  if (s.colorOverlay !== 'none') target.setAttribute('data-color-overlay', s.colorOverlay);
+  else target.removeAttribute('data-color-overlay');
 
-  if (s.textAlign !== 'default') root.setAttribute('data-text-align', s.textAlign);
-  else root.removeAttribute('data-text-align');
+  if (s.textAlign !== 'default') target.setAttribute('data-text-align', s.textAlign);
+  else target.removeAttribute('data-text-align');
 
-  root.style.setProperty('--line-height-scale', `${s.lineHeight / 100}`);
-  root.style.setProperty('--letter-spacing-scale', `${(s.letterSpacing - 100) / 100}em`);
-  root.style.setProperty('--word-spacing-scale', `${(s.wordSpacing - 100) / 100}em`);
+  const cursor = buildA11yCursor(s.cursorSize);
+  if (cursor) {
+    target.style.setProperty('--a11y-cursor', cursor);
+    target.setAttribute('data-cursor-size', String(s.cursorSize));
+  } else {
+    target.style.removeProperty('--a11y-cursor');
+    target.removeAttribute('data-cursor-size');
+  }
 
-  if (s.cursorSize >= 200) root.setAttribute('data-cursor-size', 'xlarge');
-  else if (s.cursorSize > 100) root.setAttribute('data-cursor-size', 'large');
-  else root.removeAttribute('data-cursor-size');
+  const active = countActive(s) > 0;
+  if (active) target.setAttribute('data-a11y', 'on');
+  else target.removeAttribute('data-a11y');
 }

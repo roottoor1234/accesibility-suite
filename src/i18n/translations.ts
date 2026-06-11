@@ -63,6 +63,8 @@ export const translations = {
     ariaWordSpacingPlus: 'Αύξηση απόστασης λέξεων',
     ariaCursorMinus: 'Μείωση μεγέθους δείκτη',
     ariaCursorPlus: 'Αύξηση μεγέθους δείκτη',
+    cursorPreviewHint: 'Κινήστε τον δείκτη εδώ για προεπισκόπηση',
+    cursorPreviewDefault: 'Προεπιλογή (100%)',
 
     resetDone: 'Όλες οι ρυθμίσεις επαναφέρθηκαν.',
     language: 'Γλώσσα',
@@ -150,6 +152,8 @@ export const translations = {
     ariaWordSpacingPlus: 'Increase word spacing',
     ariaCursorMinus: 'Decrease cursor size',
     ariaCursorPlus: 'Increase cursor size',
+    cursorPreviewHint: 'Move your cursor here to preview',
+    cursorPreviewDefault: 'Default (100%)',
 
     resetDone: 'All settings have been reset.',
     language: 'Language',
@@ -236,6 +240,8 @@ export const translations = {
     ariaWordSpacingPlus: 'Wortabstand vergrößern',
     ariaCursorMinus: 'Cursor verkleinern',
     ariaCursorPlus: 'Cursor vergrößern',
+    cursorPreviewHint: 'Bewegen Sie den Cursor hier zur Vorschau',
+    cursorPreviewDefault: 'Standard (100 %)',
 
     resetDone: 'Alle Einstellungen wurden zurückgesetzt.',
     language: 'Sprache',

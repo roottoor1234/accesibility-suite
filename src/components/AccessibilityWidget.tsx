@@ -29,6 +29,7 @@ import { useAccessibility } from "../contexts/AccessibilityContext";
 import { useTextToSpeech } from "../hooks/useTextToSpeech";
 import { ReadingGuide } from "./ReadingGuide";
 import { t, type TranslationKey } from "../i18n/translations";
+import { buildA11yCursor } from "../utils/cursorSize";
 
 export type WidgetPosition =
   | "bottom-right"
@@ -621,14 +622,11 @@ export function AccessibilityWidget({
                     />
                   </div>
 
-                  <SliderRow
-                    icon={<MousePointer className="w-4 h-4" />}
+                  <CursorSliderRow
                     label={L("cursorSize")}
                     value={settings.cursorSize}
-                    unit="%"
-                    min={100}
-                    max={300}
-                    step={50}
+                    previewHint={L("cursorPreviewHint")}
+                    previewDefault={L("cursorPreviewDefault")}
                     onChange={(v) => updateSetting("cursorSize", v)}
                     ariaLabelMinus={L("ariaCursorMinus")}
                     ariaLabelPlus={L("ariaCursorPlus")}
@@ -766,6 +764,50 @@ function ToggleTile({
         {label}
       </span>
     </button>
+  );
+}
+
+function CursorSliderRow({
+  label,
+  value,
+  previewHint,
+  previewDefault,
+  onChange,
+  ariaLabelMinus,
+  ariaLabelPlus,
+}: {
+  label: string;
+  value: number;
+  previewHint: string;
+  previewDefault: string;
+  onChange: (v: number) => void;
+  ariaLabelMinus: string;
+  ariaLabelPlus: string;
+}) {
+  const cursor = buildA11yCursor(value);
+
+  return (
+    <div className="space-y-2">
+      <SliderRow
+        icon={<MousePointer className="w-4 h-4" />}
+        label={label}
+        value={value}
+        unit="%"
+        min={100}
+        max={300}
+        step={50}
+        onChange={onChange}
+        ariaLabelMinus={ariaLabelMinus}
+        ariaLabelPlus={ariaLabelPlus}
+      />
+      <div
+        className="a11y-cursor-preview h-16 rounded-xl border-2 border-dashed border-blue-200 bg-gradient-to-br from-gray-50 to-blue-50/40 flex items-center justify-center text-xs text-gray-500 select-none"
+        style={{ '--a11y-cursor-preview': cursor ?? 'default' } as React.CSSProperties}
+        aria-hidden="true"
+      >
+        {cursor ? previewHint : previewDefault}
+      </div>
+    </div>
   );
 }
 

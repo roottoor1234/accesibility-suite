@@ -49,14 +49,7 @@
 }
 
 @layer base {
-  :root {
-    --line-height-scale: 1;
-    --letter-spacing-scale: 0em;
-    --word-spacing-scale: 0em;
-    --cursor-size-scale: 1;
-  }
-
-  /* ─── Focus μόνο μέσα στο widget (όχι σε όλη τη σελίδα) ─── */
+  /* ─── Focus μόνο μέσα στο widget (όχι σε όλη τη host σελίδα) ─── */
   .accessibility-widget *:focus-visible {
     outline: 3px solid #2563eb;
     outline-offset: 2px;
@@ -65,72 +58,43 @@
     outline: none;
   }
 
-  /* ─── Text Spacing (WCAG 1.4.12) — μόνο περιεχόμενο σελίδας ─── */
-  [data-a11y="on"] .a11y-content-wrap * {
-    line-height: calc(1.5 * var(--line-height-scale));
-    letter-spacing: var(--letter-spacing-scale);
-    word-spacing: var(--word-spacing-scale);
-  }
-
-  /* ─── Cursor ─── */
-  [data-a11y="on"] .a11y-content-wrap {
+  /* ─── Page effects: scoped to .a11y-content-wrap only (widget UI excluded) ─── */
+  .a11y-content-wrap[data-a11y="on"] {
+    font-size: var(--a11y-text-size, 100%);
     cursor: auto;
   }
-  [data-a11y="on"] .a11y-content-wrap * {
+  .a11y-content-wrap[data-a11y="on"] * {
+    line-height: calc(1.5 * var(--line-height-scale, 1));
+    letter-spacing: var(--letter-spacing-scale, 0em);
+    word-spacing: var(--word-spacing-scale, 0em);
     cursor: inherit;
   }
 
-  /* ─── High Contrast (WCAG 1.4.3 / 1.4.6) ─── */
-  [data-a11y="on"][data-high-contrast="true"] {
+  .a11y-content-wrap[data-high-contrast="true"] {
     background-color: #000 !important;
     color: #fff !important;
   }
-  [data-a11y="on"][data-high-contrast="true"] .a11y-content-wrap * {
+  .a11y-content-wrap[data-high-contrast="true"] * {
     background-color: #000 !important;
     color: #fff !important;
     border-color: #fff !important;
   }
-  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget [role="dialog"] {
-    background-color: #111 !important;
-    border-left: 2px solid #fff !important;
-  }
-  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget button {
-    background-color: #222 !important;
-    color: #fff !important;
-    border-color: #555 !important;
-  }
-  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget button[aria-pressed="true"],
-  [data-a11y="on"][data-high-contrast="true"] .accessibility-widget .active-tile {
-    background-color: #1a3a6a !important;
-    border-color: #93c5fd !important;
-  }
 
-  /* ─── Invert Colors (WCAG 1.4.3) – μόνο στο περιεχόμενο, όχι στο widget ─── */
-  [data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap {
+  .a11y-content-wrap[data-invert-colors="true"] {
     filter: invert(1) hue-rotate(180deg);
   }
-  [data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap img,
-  [data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap video,
-  [data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap svg {
+  .a11y-content-wrap[data-invert-colors="true"] img,
+  .a11y-content-wrap[data-invert-colors="true"] video,
+  .a11y-content-wrap[data-invert-colors="true"] svg {
     filter: invert(1) hue-rotate(180deg);
   }
 
-  /* ─── Saturation (WCAG 1.4.1) – μόνο στο περιεχόμενο ─── */
-  [data-a11y="on"][data-saturation="low"] .a11y-content-wrap {
-    filter: saturate(0.3);
-  }
-  [data-a11y="on"][data-saturation="high"] .a11y-content-wrap {
-    filter: saturate(2);
-  }
-  [data-a11y="on"][data-saturation="monochrome"] .a11y-content-wrap {
-    filter: grayscale(1);
-  }
+  .a11y-content-wrap[data-saturation="low"] { filter: saturate(0.3); }
+  .a11y-content-wrap[data-saturation="high"] { filter: saturate(2); }
+  .a11y-content-wrap[data-saturation="monochrome"] { filter: grayscale(1); }
 
-  /* ─── Color Overlay – μόνο πάνω στο περιεχόμενο, ώστε το widget να μένει κλικάρι ─── */
-  [data-a11y="on"][data-color-overlay] .a11y-content-wrap {
-    position: relative;
-  }
-  [data-a11y="on"][data-color-overlay] .a11y-content-wrap::before {
+  .a11y-content-wrap[data-color-overlay] { position: relative; }
+  .a11y-content-wrap[data-color-overlay]::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -138,29 +102,19 @@
     pointer-events: none;
     mix-blend-mode: multiply;
   }
-  [data-a11y="on"][data-color-overlay="yellow"] .a11y-content-wrap::before {
-    background: rgba(255, 255, 100, 0.15);
-  }
-  [data-a11y="on"][data-color-overlay="blue"] .a11y-content-wrap::before {
-    background: rgba(100, 150, 255, 0.12);
-  }
-  [data-a11y="on"][data-color-overlay="green"] .a11y-content-wrap::before {
-    background: rgba(100, 255, 130, 0.1);
-  }
-  [data-a11y="on"][data-color-overlay="pink"] .a11y-content-wrap::before {
-    background: rgba(255, 130, 180, 0.1);
-  }
+  .a11y-content-wrap[data-color-overlay="yellow"]::before { background: rgba(255, 255, 100, 0.15); }
+  .a11y-content-wrap[data-color-overlay="blue"]::before { background: rgba(100, 150, 255, 0.12); }
+  .a11y-content-wrap[data-color-overlay="green"]::before { background: rgba(100, 255, 130, 0.1); }
+  .a11y-content-wrap[data-color-overlay="pink"]::before { background: rgba(255, 130, 180, 0.1); }
 
-  /* ─── Pause Animations — μόνο στο wrap περιεχομένου ─── */
-  [data-a11y="on"][data-pause-animations="true"] .a11y-content-wrap,
-  [data-a11y="on"][data-pause-animations="true"] .a11y-content-wrap * {
+  .a11y-content-wrap[data-pause-animations="true"],
+  .a11y-content-wrap[data-pause-animations="true"] * {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
 
-  /* ─── Highlight Links (WCAG 2.4.4 / 1.4.1) ─── */
-  [data-a11y="on"][data-highlight-links="true"] .a11y-content-wrap a {
+  .a11y-content-wrap[data-highlight-links="true"] a {
     background-color: #fef08a !important;
     color: #000 !important;
     text-decoration: underline !important;
@@ -170,18 +124,13 @@
     border-radius: 3px !important;
     outline: 2px solid #eab308 !important;
   }
-  [data-a11y="on"][data-highlight-links="true"] .accessibility-widget a {
-    background-color: transparent !important;
-    outline: none !important;
-  }
 
-  /* ─── Highlight Headings (WCAG 1.3.1 Info and Relationships) ─── */
-  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h1,
-  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h2,
-  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h3,
-  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h4,
-  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h5,
-  [data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h6 {
+  .a11y-content-wrap[data-highlight-headings="true"] h1,
+  .a11y-content-wrap[data-highlight-headings="true"] h2,
+  .a11y-content-wrap[data-highlight-headings="true"] h3,
+  .a11y-content-wrap[data-highlight-headings="true"] h4,
+  .a11y-content-wrap[data-highlight-headings="true"] h5,
+  .a11y-content-wrap[data-highlight-headings="true"] h6 {
     border-bottom: 3px solid #3b82f6 !important;
     padding-bottom: 4px !important;
     background: linear-gradient(to right, rgba(59, 130, 246, 0.08), transparent) !important;
@@ -189,80 +138,54 @@
     border-left: 4px solid #3b82f6 !important;
     border-radius: 2px !important;
   }
-  [data-a11y="on"][data-highlight-headings="true"] .accessibility-widget h1,
-  [data-a11y="on"][data-highlight-headings="true"] .accessibility-widget h2,
-  [data-a11y="on"][data-highlight-headings="true"] .accessibility-widget h3 {
-    border: none !important;
-    background: transparent !important;
-    padding-left: 0 !important;
-  }
 
-  /* ─── Dyslexic Font (WCAG 1.4.12) ─── */
-  [data-a11y="on"][data-dyslexic-font="true"] .a11y-content-wrap,
-  [data-a11y="on"][data-dyslexic-font="true"] .a11y-content-wrap * {
+  .a11y-content-wrap[data-dyslexic-font="true"],
+  .a11y-content-wrap[data-dyslexic-font="true"] * {
     font-family: 'Comic Sans MS', 'OpenDyslexic', Arial, Helvetica, sans-serif !important;
     font-weight: 500 !important;
   }
 
-  /* ─── Hide Images (WCAG 1.1.1) ─── */
-  [data-a11y="on"][data-hide-images="true"] .a11y-content-wrap img,
-  [data-a11y="on"][data-hide-images="true"] .a11y-content-wrap svg:not(.a11y-icon),
-  [data-a11y="on"][data-hide-images="true"] .a11y-content-wrap video,
-  [data-a11y="on"][data-hide-images="true"] .a11y-content-wrap picture {
+  .a11y-content-wrap[data-hide-images="true"] img,
+  .a11y-content-wrap[data-hide-images="true"] svg:not(.a11y-icon),
+  .a11y-content-wrap[data-hide-images="true"] video,
+  .a11y-content-wrap[data-hide-images="true"] picture {
     opacity: 0.05 !important;
     pointer-events: none !important;
   }
-  [data-a11y="on"][data-hide-images="true"] .accessibility-widget img,
-  [data-a11y="on"][data-hide-images="true"] .accessibility-widget svg {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
 
-  /* ─── Text Align (WCAG 1.4.8 Visual Presentation) ─── */
-  [data-a11y="on"][data-text-align="left"] .a11y-content-wrap * {
-    text-align: left !important;
-  }
-  [data-a11y="on"][data-text-align="center"] .a11y-content-wrap * {
-    text-align: center !important;
-  }
-  [data-a11y="on"][data-text-align="right"] .a11y-content-wrap * {
-    text-align: right !important;
-  }
-  [data-a11y="on"][data-text-align] .accessibility-widget * {
-    text-align: initial !important;
-  }
+  .a11y-content-wrap[data-text-align="left"] * { text-align: left !important; }
+  .a11y-content-wrap[data-text-align="center"] * { text-align: center !important; }
+  .a11y-content-wrap[data-text-align="right"] * { text-align: right !important; }
 
-  /* ─── Focus Highlight Enhanced — μόνο περιεχόμενο σελίδας ─── */
-  [data-a11y="on"][data-focus-highlight="true"] .a11y-content-wrap *:focus-visible {
+  .a11y-content-wrap[data-focus-highlight="true"] *:focus-visible {
     outline: 4px solid #ef4444 !important;
     outline-offset: 4px !important;
     box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.3) !important;
   }
 
-  /* ─── Target Size (WCAG 2.5.5 / 2.5.8 – 44×44px AAA) — μόνο μέσα στο περιεχόμενο ─── */
-  [data-a11y="on"] .a11y-content-wrap button,
-  [data-a11y="on"] .a11y-content-wrap a,
-  [data-a11y="on"] .a11y-content-wrap [role="button"],
-  [data-a11y="on"] .a11y-content-wrap input[type="checkbox"],
-  [data-a11y="on"] .a11y-content-wrap input[type="radio"] {
+  .a11y-content-wrap[data-a11y="on"] button,
+  .a11y-content-wrap[data-a11y="on"] a,
+  .a11y-content-wrap[data-a11y="on"] [role="button"],
+  .a11y-content-wrap[data-a11y="on"] input[type="checkbox"],
+  .a11y-content-wrap[data-a11y="on"] input[type="radio"] {
     min-width: 44px !important;
     min-height: 44px !important;
   }
 
-  /* ─── Cursor Size (motor accessibility) ─── */
-  [data-a11y="on"][data-cursor-size="large"] .a11y-content-wrap,
-  [data-a11y="on"][data-cursor-size="large"] .a11y-content-wrap * {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><path d="M4 4 L4 42 L18 30 L26 44 L32 40 L24 27 L40 27 Z" fill="black" stroke="white" stroke-width="2"/></svg>') 0 0, auto !important;
+  .a11y-content-wrap[data-cursor-size] {
+    cursor: var(--a11y-cursor) !important;
   }
-  [data-a11y="on"][data-cursor-size="xlarge"] .a11y-content-wrap,
-  [data-a11y="on"][data-cursor-size="xlarge"] .a11y-content-wrap * {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><path d="M5 5 L5 56 L24 40 L34 58 L42 54 L32 36 L52 36 Z" fill="black" stroke="white" stroke-width="3"/></svg>') 0 0, auto !important;
+  .a11y-content-wrap[data-cursor-size] * {
+    cursor: inherit !important;
   }
 
-  /* Override cursor inside widget */
   .accessibility-widget,
   .accessibility-widget * {
     cursor: pointer !important;
+  }
+
+  .a11y-cursor-preview {
+    cursor: var(--a11y-cursor-preview, default) !important;
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -73,6 +73,16 @@ function getScriptConfig(): { accountId: string | null; baseUrl: string | null; 
   return { accountId, baseUrl, cssUrl };
 }
 
+/** Resolve widget CSS when script.src is unavailable (e.g. dynamic inject without currentScript). */
+function resolveCssFallback(baseUrl: string): string {
+  // npm/jsDelivr: .../lib/index.min.js → .../lib/index.min.css
+  if (/\/lib\/?$/.test(baseUrl.replace(/\/?$/, ''))) {
+    return baseUrl + 'index.min.css';
+  }
+  // dist-widget CDN: .../a11y-widget.css
+  return baseUrl + 'a11y-widget.css';
+}
+
 /**
  * Inject minimal global CSS for page effects.
  * IMPORTANT: Everything is guarded by `[data-a11y="on"]` so nothing changes unless user enables a feature.
@@ -83,44 +93,38 @@ function ensureGlobalEffectsStyle(): void {
   const style = document.createElement('style');
   style.id = id;
   style.textContent = `
-:root {
-  --line-height-scale: 1;
-  --letter-spacing-scale: 0em;
-  --word-spacing-scale: 0em;
-  --cursor-size-scale: 1;
-  --a11y-text-size: 100%;
+/* Page effects scoped to .a11y-content-wrap only — widget UI is never targeted */
+
+.a11y-content-wrap[data-a11y="on"] {
+  font-size: var(--a11y-text-size, 100%);
+}
+.a11y-content-wrap[data-a11y="on"] * {
+  line-height: calc(1.5 * var(--line-height-scale, 1));
+  letter-spacing: var(--letter-spacing-scale, 0em);
+  word-spacing: var(--word-spacing-scale, 0em);
 }
 
-/* Text spacing */
-[data-a11y="on"] .a11y-content-wrap {
-  font-size: var(--a11y-text-size);
+.a11y-content-wrap[data-high-contrast="true"] {
+  background-color: #000 !important;
+  color: #fff !important;
 }
-[data-a11y="on"] .a11y-content-wrap * {
-  line-height: calc(1.5 * var(--line-height-scale));
-  letter-spacing: var(--letter-spacing-scale);
-  word-spacing: var(--word-spacing-scale);
-}
-
-/* High contrast */
-[data-a11y="on"][data-high-contrast="true"] { background-color: #000 !important; color: #fff !important; }
-[data-a11y="on"][data-high-contrast="true"] .a11y-content-wrap * {
+.a11y-content-wrap[data-high-contrast="true"] * {
   background-color: #000 !important;
   color: #fff !important;
   border-color: #fff !important;
 }
 
-/* Invert / saturation / overlay only on wrap */
-[data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap { filter: invert(1) hue-rotate(180deg); }
-[data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap img,
-[data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap video,
-[data-a11y="on"][data-invert-colors="true"] .a11y-content-wrap svg { filter: invert(1) hue-rotate(180deg); }
+.a11y-content-wrap[data-invert-colors="true"] { filter: invert(1) hue-rotate(180deg); }
+.a11y-content-wrap[data-invert-colors="true"] img,
+.a11y-content-wrap[data-invert-colors="true"] video,
+.a11y-content-wrap[data-invert-colors="true"] svg { filter: invert(1) hue-rotate(180deg); }
 
-[data-a11y="on"][data-saturation="low"] .a11y-content-wrap { filter: saturate(0.3); }
-[data-a11y="on"][data-saturation="high"] .a11y-content-wrap { filter: saturate(2); }
-[data-a11y="on"][data-saturation="monochrome"] .a11y-content-wrap { filter: grayscale(1); }
+.a11y-content-wrap[data-saturation="low"] { filter: saturate(0.3); }
+.a11y-content-wrap[data-saturation="high"] { filter: saturate(2); }
+.a11y-content-wrap[data-saturation="monochrome"] { filter: grayscale(1); }
 
-[data-a11y="on"][data-color-overlay] .a11y-content-wrap { position: relative; }
-[data-a11y="on"][data-color-overlay] .a11y-content-wrap::before {
+.a11y-content-wrap[data-color-overlay] { position: relative; }
+.a11y-content-wrap[data-color-overlay]::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -128,21 +132,19 @@ function ensureGlobalEffectsStyle(): void {
   pointer-events: none;
   mix-blend-mode: multiply;
 }
-[data-a11y="on"][data-color-overlay="yellow"] .a11y-content-wrap::before { background: rgba(255, 255, 100, 0.15); }
-[data-a11y="on"][data-color-overlay="blue"] .a11y-content-wrap::before { background: rgba(100, 150, 255, 0.12); }
-[data-a11y="on"][data-color-overlay="green"] .a11y-content-wrap::before { background: rgba(100, 255, 130, 0.10); }
-[data-a11y="on"][data-color-overlay="pink"] .a11y-content-wrap::before { background: rgba(255, 130, 180, 0.10); }
+.a11y-content-wrap[data-color-overlay="yellow"]::before { background: rgba(255, 255, 100, 0.15); }
+.a11y-content-wrap[data-color-overlay="blue"]::before { background: rgba(100, 150, 255, 0.12); }
+.a11y-content-wrap[data-color-overlay="green"]::before { background: rgba(100, 255, 130, 0.10); }
+.a11y-content-wrap[data-color-overlay="pink"]::before { background: rgba(255, 130, 180, 0.10); }
 
-/* Pause animations */
-[data-a11y="on"][data-pause-animations="true"] .a11y-content-wrap,
-[data-a11y="on"][data-pause-animations="true"] .a11y-content-wrap * {
+.a11y-content-wrap[data-pause-animations="true"],
+.a11y-content-wrap[data-pause-animations="true"] * {
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
 }
 
-/* Highlight links */
-[data-a11y="on"][data-highlight-links="true"] .a11y-content-wrap a {
+.a11y-content-wrap[data-highlight-links="true"] a {
   background-color: #fef08a !important;
   color: #000 !important;
   text-decoration: underline !important;
@@ -153,13 +155,12 @@ function ensureGlobalEffectsStyle(): void {
   outline: 2px solid #eab308 !important;
 }
 
-/* Highlight headings */
-[data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h1,
-[data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h2,
-[data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h3,
-[data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h4,
-[data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h5,
-[data-a11y="on"][data-highlight-headings="true"] .a11y-content-wrap h6 {
+.a11y-content-wrap[data-highlight-headings="true"] h1,
+.a11y-content-wrap[data-highlight-headings="true"] h2,
+.a11y-content-wrap[data-highlight-headings="true"] h3,
+.a11y-content-wrap[data-highlight-headings="true"] h4,
+.a11y-content-wrap[data-highlight-headings="true"] h5,
+.a11y-content-wrap[data-highlight-headings="true"] h6 {
   border-bottom: 3px solid #3b82f6 !important;
   padding-bottom: 4px !important;
   background: linear-gradient(to right, rgba(59,130,246,0.08), transparent) !important;
@@ -168,52 +169,44 @@ function ensureGlobalEffectsStyle(): void {
   border-radius: 2px !important;
 }
 
-/* Dyslexic font */
-[data-a11y="on"][data-dyslexic-font="true"] .a11y-content-wrap,
-[data-a11y="on"][data-dyslexic-font="true"] .a11y-content-wrap * {
+.a11y-content-wrap[data-dyslexic-font="true"],
+.a11y-content-wrap[data-dyslexic-font="true"] * {
   font-family: "Comic Sans MS","OpenDyslexic",Arial,Helvetica,sans-serif !important;
   font-weight: 500 !important;
 }
 
-/* Hide images */
-[data-a11y="on"][data-hide-images="true"] .a11y-content-wrap img,
-[data-a11y="on"][data-hide-images="true"] .a11y-content-wrap svg,
-[data-a11y="on"][data-hide-images="true"] .a11y-content-wrap video,
-[data-a11y="on"][data-hide-images="true"] .a11y-content-wrap picture {
+.a11y-content-wrap[data-hide-images="true"] img,
+.a11y-content-wrap[data-hide-images="true"] svg,
+.a11y-content-wrap[data-hide-images="true"] video,
+.a11y-content-wrap[data-hide-images="true"] picture {
   opacity: 0.05 !important;
   pointer-events: none !important;
 }
 
-/* Text align */
-[data-a11y="on"][data-text-align="left"] .a11y-content-wrap * { text-align: left !important; }
-[data-a11y="on"][data-text-align="center"] .a11y-content-wrap * { text-align: center !important; }
-[data-a11y="on"][data-text-align="right"] .a11y-content-wrap * { text-align: right !important; }
+.a11y-content-wrap[data-text-align="left"] * { text-align: left !important; }
+.a11y-content-wrap[data-text-align="center"] * { text-align: center !important; }
+.a11y-content-wrap[data-text-align="right"] * { text-align: right !important; }
 
-/* Focus highlight */
-[data-a11y="on"][data-focus-highlight="true"] .a11y-content-wrap *:focus-visible {
+.a11y-content-wrap[data-focus-highlight="true"] *:focus-visible {
   outline: 4px solid #ef4444 !important;
   outline-offset: 4px !important;
   box-shadow: 0 0 0 6px rgba(239,68,68,0.3) !important;
 }
 
-/* Target size */
-[data-a11y="on"] .a11y-content-wrap button,
-[data-a11y="on"] .a11y-content-wrap a,
-[data-a11y="on"] .a11y-content-wrap [role="button"],
-[data-a11y="on"] .a11y-content-wrap input[type="checkbox"],
-[data-a11y="on"] .a11y-content-wrap input[type="radio"] {
+.a11y-content-wrap[data-a11y="on"] button,
+.a11y-content-wrap[data-a11y="on"] a,
+.a11y-content-wrap[data-a11y="on"] [role="button"],
+.a11y-content-wrap[data-a11y="on"] input[type="checkbox"],
+.a11y-content-wrap[data-a11y="on"] input[type="radio"] {
   min-width: 44px !important;
   min-height: 44px !important;
 }
 
-/* Cursor size */
-[data-a11y="on"][data-cursor-size="large"] .a11y-content-wrap,
-[data-a11y="on"][data-cursor-size="large"] .a11y-content-wrap * {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><path d="M4 4 L4 42 L18 30 L26 44 L32 40 L24 27 L40 27 Z" fill="black" stroke="white" stroke-width="2"/></svg>') 0 0, auto !important;
+.a11y-content-wrap[data-cursor-size] {
+  cursor: var(--a11y-cursor) !important;
 }
-[data-a11y="on"][data-cursor-size="xlarge"] .a11y-content-wrap,
-[data-a11y="on"][data-cursor-size="xlarge"] .a11y-content-wrap * {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><path d="M5 5 L5 56 L24 40 L34 58 L42 54 L32 36 L52 36 Z" fill="black" stroke="white" stroke-width="3"/></svg>') 0 0, auto !important;
+.a11y-content-wrap[data-cursor-size] * {
+  cursor: inherit !important;
 }
 `;
   (document.head || document.documentElement).appendChild(style);
@@ -235,16 +228,29 @@ function ensureShadowBaseStyle(shadow: ShadowRoot): void {
   const style = document.createElement('style');
   style.id = id;
   style.textContent = `
-/* Base defaults INSIDE shadow only (preflight-like, but scoped) */
-#a11y-widget-container {
+/* Isolate widget UI from page a11y settings (CSS vars, inherited color/font) */
+:host {
+  font-size: 16px;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  /* Slightly larger base for readability on content-heavy sites */
-  font-size: 17px;
   line-height: 1.5;
-  text-rendering: geometricPrecision;
-  /* Prevent page text-spacing features from affecting widget UI */
   letter-spacing: normal;
   word-spacing: normal;
+  color: #111827;
+  --a11y-text-size: 100%;
+  --line-height-scale: 1;
+  --letter-spacing-scale: 0em;
+  --word-spacing-scale: 0em;
+}
+
+/* Base defaults INSIDE shadow only (preflight-like, but scoped) */
+#a11y-widget-container {
+  font-family: inherit;
+  font-size: 16px;
+  line-height: inherit;
+  text-rendering: geometricPrecision;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  color: inherit;
 }
 
 #a11y-widget-container,
@@ -256,7 +262,11 @@ function ensureShadowBaseStyle(shadow: ShadowRoot): void {
 #a11y-widget-container input,
 #a11y-widget-container select,
 #a11y-widget-container textarea {
-  font: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
   color: inherit;
 }
 
@@ -273,9 +283,9 @@ function ensureShadowBaseStyle(shadow: ShadowRoot): void {
   cursor: pointer;
 }
 
-/* Make small text a bit more readable */
-#a11y-widget-container .text-xs { font-size: 0.8125rem; line-height: 1.1rem; }
-#a11y-widget-container .text-sm { font-size: 0.9375rem; line-height: 1.35rem; }
+/* Typography overrides (px — not rem — for host font-size independence) */
+#a11y-widget-container .text-xs { font-size: 13px; line-height: 17.6px; }
+#a11y-widget-container .text-sm { font-size: 15px; line-height: 21.6px; }
 `;
   shadow.appendChild(style);
 }
@@ -296,7 +306,7 @@ window.initA11yWidget = async (options = {}) => {
   }
 
   // Ensure CSS is loaded (supports both dist-widget and npm/jsDelivr outputs).
-  const resolvedCssUrl = cssUrl ?? (baseUrl ? baseUrl + 'a11y-widget.css' : null);
+  const resolvedCssUrl = cssUrl ?? (baseUrl ? resolveCssFallback(baseUrl) : null);
   // In Shadow DOM mode we DO NOT load full widget CSS in document head (prevents global leakage).
   // We only inject a minimal effects stylesheet guarded by [data-a11y="on"].
   ensureGlobalEffectsStyle();
