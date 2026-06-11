@@ -95,9 +95,19 @@ function ensureGlobalEffectsStyle(): void {
   style.textContent = `
 /* Page effects scoped to .a11y-content-wrap only — widget UI is never targeted */
 
-.a11y-content-wrap[data-a11y="on"] {
-  font-size: var(--a11y-text-size, 100%);
+/* Aggressive text scaling: zoom overrides host px/rem (Bootstrap 3, Drupal themes, etc.) */
+.a11y-content-wrap[data-text-size]:not([data-text-size="100"]) {
+  zoom: var(--a11y-text-zoom, 1) !important;
 }
+@supports not (zoom: 1) {
+  .a11y-content-wrap[data-text-size]:not([data-text-size="100"]) {
+    font-size: var(--a11y-text-size, 100%) !important;
+  }
+  .a11y-content-wrap[data-text-size]:not([data-text-size="100"]) *:not(svg):not(svg *):not(style):not(script) {
+    font-size: inherit !important;
+  }
+}
+
 .a11y-content-wrap[data-a11y="on"] * {
   line-height: calc(1.5 * var(--line-height-scale, 1));
   letter-spacing: var(--letter-spacing-scale, 0em);

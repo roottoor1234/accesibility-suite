@@ -1,0 +1,66 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - heading "WCAG Widget – CSS Conflict Test" [level=1] [ref=e3]
+    - paragraph [ref=e4]:
+      - text: Άνοιξε DevTools (F12) →
+      - strong [ref=e5]: Console
+      - text: και
+      - strong [ref=e6]: Network
+      - text: . Βεβαιώσου ότι φορτώνουν 200 τα
+      - code [ref=e7]: index.min.css
+      - text: και
+      - code [ref=e8]: index.min.js
+      - text: . Μετά, χωρίς να πατήσεις τίποτα στο widget, έλεγξε αν αλλάζουν τα controls παρακάτω.
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - heading "Checkbox / Radio" [level=2] [ref=e11]
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - checkbox "Checkbox A" [ref=e14]
+            - text: Checkbox A
+          - generic [ref=e15]:
+            - checkbox "Checkbox B" [ref=e16]
+            - text: Checkbox B
+        - generic [ref=e17]:
+          - generic [ref=e18]:
+            - radio "Radio 1" [ref=e19]
+            - text: Radio 1
+          - generic [ref=e20]:
+            - radio "Radio 2" [ref=e21]
+            - text: Radio 2
+      - generic [ref=e22]:
+        - heading "Buttons / Links" [level=2] [ref=e23]
+        - generic [ref=e24]:
+          - button "Button" [ref=e25]
+          - link "Link" [ref=e26] [cursor=pointer]:
+            - /url: "#"
+        - paragraph [ref=e27]: Αν δεις αλλαγές σε outline/focus χωρίς να ενεργοποιήσεις feature, είναι πιθανό conflict.
+      - generic [ref=e28]:
+        - heading "Accordion" [level=2] [ref=e29]
+        - group [ref=e30]:
+          - generic "Άνοιγμα" [ref=e31]
+      - generic [ref=e32]:
+        - heading "Form fields" [level=2] [ref=e33]
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - text: "Input:"
+            - textbox "Input:" [ref=e36]:
+              - /placeholder: Type here
+          - generic [ref=e37]:
+            - text: "Select:"
+            - combobox "Select:" [ref=e38]:
+              - option "Option 1" [selected]
+              - option "Option 2"
+          - generic [ref=e39]:
+            - text: "Textarea:"
+            - textbox "Textarea:" [ref=e40]:
+              - /placeholder: ...
+    - separator [ref=e41]
+    - paragraph [ref=e42]:
+      - text: "Tip: Για να δεις αν rule έρχεται από το widget, κάνε inspect ένα element → tab"
+      - strong [ref=e43]: Styles
+      - text: και ψάξε για κανόνες που δείχνουν σε
+      - code [ref=e44]: index.min.css
+      - text: .
+  - button "Άνοιγμα μενού προσβασιμότητας" [ref=e46] [cursor=pointer]:
+    - img [ref=e47]

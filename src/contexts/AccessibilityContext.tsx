@@ -189,10 +189,12 @@ function clearLegacyPageAttrs(): void {
     'data-saturation',
     'data-color-overlay',
     'data-text-align',
+    'data-text-size',
     'data-cursor-size',
   ];
   for (const attr of legacyAttrs) root.removeAttribute(attr);
   root.style.removeProperty('--a11y-text-size');
+  root.style.removeProperty('--a11y-text-zoom');
   root.style.removeProperty('--line-height-scale');
   root.style.removeProperty('--letter-spacing-scale');
   root.style.removeProperty('--word-spacing-scale');
@@ -211,6 +213,9 @@ function applySettings(s: AccessibilitySettings) {
    * Έτσι δεν διαρρέουν CSS variables / inherited styles στο widget (Shadow DOM host).
    */
   target.style.setProperty('--a11y-text-size', `${s.textSize}%`);
+  target.style.setProperty('--a11y-text-zoom', String(s.textSize / 100));
+  if (s.textSize !== 100) target.setAttribute('data-text-size', String(s.textSize));
+  else target.removeAttribute('data-text-size');
   target.style.setProperty('--line-height-scale', `${s.lineHeight / 100}`);
   target.style.setProperty('--letter-spacing-scale', `${(s.letterSpacing - 100) / 100}em`);
   target.style.setProperty('--word-spacing-scale', `${(s.wordSpacing - 100) / 100}em`);

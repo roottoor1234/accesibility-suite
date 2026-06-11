@@ -59,8 +59,19 @@
   }
 
   /* ─── Page effects: scoped to .a11y-content-wrap only (widget UI excluded) ─── */
+  .a11y-content-wrap[data-text-size]:not([data-text-size="100"]) {
+    zoom: var(--a11y-text-zoom, 1) !important;
+  }
+  @supports not (zoom: 1) {
+    .a11y-content-wrap[data-text-size]:not([data-text-size="100"]) {
+      font-size: var(--a11y-text-size, 100%) !important;
+    }
+    .a11y-content-wrap[data-text-size]:not([data-text-size="100"]) *:not(svg):not(svg *):not(style):not(script) {
+      font-size: inherit !important;
+    }
+  }
+
   .a11y-content-wrap[data-a11y="on"] {
-    font-size: var(--a11y-text-size, 100%);
     cursor: auto;
   }
   .a11y-content-wrap[data-a11y="on"] * {
