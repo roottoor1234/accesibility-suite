@@ -558,13 +558,13 @@ export function AccessibilityWidget({
                   </div>
 
                   <OptionRow label={L("textAlign")} icon={<AlignLeft className="w-4 h-4" />}>
-                    <div className="flex gap-1.5">
+                    <div className="grid grid-cols-2 gap-1.5">
                       {alignOpts.map((o) => (
                         <button
                           key={o}
                           type="button"
                           onClick={() => updateSetting("textAlign", o)}
-                          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all min-h-[36px]
+                          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-all min-h-[44px] w-full
                             ${
                               settings.textAlign === o
                                 ? "bg-blue-600 text-white shadow-md"
@@ -573,7 +573,7 @@ export function AccessibilityWidget({
                           aria-pressed={settings.textAlign === o}
                         >
                           {AlignIcons[o]}
-                          {L(alignKey[o])}
+                          <span className="truncate">{L(alignKey[o])}</span>
                         </button>
                       ))}
                     </div>
